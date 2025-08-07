@@ -6,6 +6,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/',  // <-- Important for Render static sites served at root URL
   plugins: [
     vue(),
     vueDevTools(),
