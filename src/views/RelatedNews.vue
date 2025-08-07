@@ -6,12 +6,19 @@
                 <img :src="coinImageUrl" :alt="coin" class="coin-image" />
             </h3>
 
-            <p>This would display fetched news for <strong>{{ coin }}</strong>.</p>
+            <div v-if="loading">🔄 Loading news...</div>
+
+            <div v-else-if="error" class="error-message">❌ {{ error }}</div>
+
+            <pre v-else class="raw-json">
+                {{ JSON.stringify(newsData, null, 2) }}
+             </pre>
 
             <button class="close-button" @click="$emit('close')">Close</button>
         </div>
     </div>
 </template>
+
 
 
 <script setup>
@@ -118,5 +125,20 @@ watch(() => props.coin, fetchNews, { immediate: true })
 
 .close-button:hover {
     background-color: #1dd89a;
+}
+
+.raw-json {
+    background-color: #f4f4f4;
+    color: #222;
+    text-align: left;
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    white-space: pre-wrap;
+    /* wraps long lines */
+    word-break: break-word;
+    margin-top: 1rem;
 }
 </style>
