@@ -14,26 +14,14 @@
                 <div v-if="newsData.length === 0">No news found for {{ coin }}.</div>
 
                 <div v-for="item in newsData" :key="item.id" class="news-item">
-                    <p class="news-date">Date {{ formatDateToGMT7(item.published_at) }}</p>
-                    <p class="news-title clickable" @click="openNews(item)" tabindex="0"
-                        @keydown.enter="openNews(item)">
-                        Title = {{ item.title }}
-                    </p>
+                    <p class="news-date">Date {{ formatDate(item.published_at) }}</p>
+                    <p class="news-title">Title {{ item.title }}</p>
+                    <p class="news-description">{{ item.description || 'No description available.' }}</p>
                     <hr />
                 </div>
             </div>
 
             <button class="close-button" @click="$emit('close')">Close</button>
-        </div>
-
-        <!-- News detail popup modal -->
-        <div v-if="selectedNews" class="news-detail-modal" @click.self="closeNews" tabindex="0" role="dialog"
-            aria-modal="true">
-            <div class="modal-content">
-                <h4>{{ selectedNews.title }}</h4>
-                <p>{{ selectedNews.description || 'No description available.' }}</p>
-                <button class="close-button" @click="closeNews">Close</button>
-            </div>
         </div>
     </div>
 </template>
@@ -41,6 +29,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { coinImageMap } from '@/assets/data/coinImageMap.js'
+import { formatDate } from '@/assets/data/dateUtil'
 
 const props = defineProps({
     coin: String
@@ -80,15 +69,6 @@ const fetchNews = async () => {
 
 // Fetch news when coin changes or on first load
 watch(() => props.coin, fetchNews, { immediate: true })
-
-function openNews(item) {
-    selectedNews.value = item
-}
-
-function closeNews() {
-    selectedNews.value = null
-}
-
 </script>
 
 
@@ -182,68 +162,5 @@ hr {
     margin: 1rem 0;
 }
 
-.news-title.clickable {
-  cursor: pointer;
-  color: #1d72b8;
-  text-decoration: underline;
-}
-
-.news-title.clickable:focus {
-  outline: 2px solid #1d72b8;
-  outline-offset: 2px;
-}
-
-.news-detail-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0,0,0,0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10000;
-}
-
-.modal-content {
-  background-color: white;
-  color: black;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-  text-align: left;
-  position: relative;
-}
-
-.modal-content h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-}
-
-.modal-content p {
-  font-size: 1rem;
-  line-height: 1.4;
-}
-
-.modal-content .close-button {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background-color: #eb6a25;
-  color: white;
-  border: none;
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.modal-content .close-button:hover {
-  background-color: #1dd89a;
-}
 
 </style>
