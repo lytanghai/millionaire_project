@@ -28,8 +28,7 @@ const newsData = ref([])
 const loading = ref(false)
 const error = ref(null)
 
-const API_TOKEN = 'c8bd94567a0599c63ef81279d2d0068cd2d85c5d'
-
+const API_TOKEN = import.meta.env.VITE_CRYPTOPANIC_API_KEY
 const fetchNews = async () => {
     if (!props.coin) return
 
