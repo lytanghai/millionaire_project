@@ -79,17 +79,16 @@ watch(() => props.coin, fetchNews, { immediate: true })
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh; /* FULL height */
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
 
-    overflow-y: auto; /* <--- Add this to allow scrolling */
-    padding: 1rem;    /* Some padding to avoid cutoffs on small screens */
+    padding: 1rem;
+    /* Remove overflow-y: auto here */
 }
-
 .popup-content {
     background-color: white;
     color: black;
@@ -97,10 +96,12 @@ watch(() => props.coin, fetchNews, { immediate: true })
     border-radius: 12px;
     width: 100%;
     max-width: 600px;
-    max-height: none;        /* Remove height limit */
+    max-height: 90vh; /* <-- Constrain height */
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+
+    overflow-y: auto; /* <-- Make popup itself scrollable */
 }
 
 .title-with-image {
