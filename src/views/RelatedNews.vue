@@ -78,7 +78,7 @@ watch(() => props.coin, fetchNews, { immediate: true })
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
+    height: auto;
     background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
@@ -92,11 +92,12 @@ watch(() => props.coin, fetchNews, { immediate: true })
     padding: 2rem;
     border-radius: 12px;
     width: 95%;
-    height: 70%;
+    max-height: 70%;
     text-align: center;
-    position: relative;
     box-sizing: border-box;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .title-with-image {
@@ -114,9 +115,8 @@ watch(() => props.coin, fetchNews, { immediate: true })
 }
 
 .close-button {
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
+    margin-top: auto;
+    align-self: flex-end;
     background-color: #eb6a25;
     color: white;
     border: none;
@@ -125,7 +125,6 @@ watch(() => props.coin, fetchNews, { immediate: true })
     cursor: pointer;
     transition: background-color 0.3s;
 }
-
 .close-button:hover {
     background-color: #1dd89a;
 }
@@ -162,5 +161,8 @@ hr {
     margin: 1rem 0;
 }
 
+@media (max-width: 600px) {
+    
+}
 
 </style>
