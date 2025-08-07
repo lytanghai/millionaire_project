@@ -67,13 +67,10 @@ const fetchNews = async () => {
     }
 }
 
-// Fetch news when coin changes or on first load
 watch(() => props.coin, fetchNews, { immediate: true })
 </script>
 
-
 <style scoped>
-
 .related-news-popup {
     position: fixed;
     top: 0;
@@ -87,7 +84,6 @@ watch(() => props.coin, fetchNews, { immediate: true })
     z-index: 9999;
 
     padding: 1rem;
-    /* Remove overflow-y: auto here */
 }
 .popup-content {
     background-color: white;
@@ -96,12 +92,12 @@ watch(() => props.coin, fetchNews, { immediate: true })
     border-radius: 12px;
     width: 100%;
     max-width: 600px;
-    max-height: 90vh; /* <-- Constrain height */
+    max-height: 90vh;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
 
-    overflow-y: auto; /* <-- Make popup itself scrollable */
+    overflow-y: auto;
 }
 
 .title-with-image {
@@ -110,6 +106,9 @@ watch(() => props.coin, fetchNews, { immediate: true })
     justify-content: center;
     gap: 0.5rem;
     flex-wrap: wrap;
+    background-color: rgb(226, 164, 164);
+    border-radius: 12px;
+    padding: .5rem
 }
 
 .coin-image {
@@ -119,8 +118,8 @@ watch(() => props.coin, fetchNews, { immediate: true })
 }
 
 .close-button {
-    margin-top: auto;
-    align-self: flex-end;
+    position: sticky;
+    bottom: 0;
     background-color: #eb6a25;
     color: white;
     border: none;
@@ -128,6 +127,9 @@ watch(() => props.coin, fetchNews, { immediate: true })
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s;
+    align-self: flex-end;
+    margin-top: 1rem;
+    z-index: 1;
 }
 .close-button:hover {
     background-color: #1dd89a;
@@ -145,7 +147,8 @@ watch(() => props.coin, fetchNews, { immediate: true })
 
 .news-date {
     font-weight: 600;
-    color: #666;
+    color: #736d6d;
+    padding: .3rem;
 }
 
 .news-title {
@@ -165,8 +168,15 @@ hr {
     margin: 1rem 0;
 }
 
-@media (max-width: 600px) {
-    
+@media (max-width: 480px) {
+    .popup-content {
+        position: absolute;
+        left: 3%;
+        top: 10%;
+        padding: 1rem;
+        width: 390px;
+        height: 80%;
+    }
 }
 
 </style>
