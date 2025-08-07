@@ -10,20 +10,26 @@
 
             <div v-else-if="error" class="error-message">❌ {{ error }}</div>
 
-            <pre v-else class="raw-json">
-                {{ JSON.stringify(newsData, null, 2) }}
-             </pre>
+            <div v-else>
+                <div v-if="newsData.length === 0">No news found for {{ coin }}.</div>
+
+                <div v-for="item in newsData" :key="item.id" class="news-item">
+                    <p class="news-date">[Date] = {{ formatDate(item.published_at) }}</p>
+                    <p class="news-title">[Title] = {{ item.title }}</p>
+                    <p class="news-description">{{ item.description || 'No description available.' }}</p>
+                    <hr />
+                </div>
+            </div>
 
             <button class="close-button" @click="$emit('close')">Close</button>
         </div>
     </div>
 </template>
 
-
-
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { coinImageMap } from '@/assets/data/coinImageMap.js'
+import { formatDate } from '@/assets/data/dateUtil'
 
 const props = defineProps({
     coin: String
@@ -127,18 +133,37 @@ watch(() => props.coin, fetchNews, { immediate: true })
     background-color: #1dd89a;
 }
 
-.raw-json {
-    background-color: #f4f4f4;
-    color: #222;
-    text-align: left;
-    max-height: 50vh;
-    overflow-y: auto;
-    padding: 1rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    white-space: pre-wrap;
-    /* wraps long lines */
-    word-break: break-word;
-    margin-top: 1rem;
+.news-item {
+    margin-bottom: 1.25rem;
 }
+
+.news-date,
+.news-title,
+.news-description {
+    margin: 0.2rem 0;
+}
+
+.news-date {
+    font-weight: 600;
+    color: #666;
+}
+
+.news-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #222;
+}
+
+.news-description {
+    font-size: 0.95rem;
+    color: #444;
+}
+
+hr {
+    border: none;
+    border-bottom: 1px solid #ddd;
+    margin: 1rem 0;
+}
+
+
 </style>
