@@ -73,17 +73,21 @@ watch(() => props.coin, fetchNews, { immediate: true })
 
 
 <style scoped>
+
 .related-news-popup {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
-    height: auto;
+    height: 100vh; /* FULL height */
     background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
+
+    overflow-y: auto; /* <--- Add this to allow scrolling */
+    padding: 1rem;    /* Some padding to avoid cutoffs on small screens */
 }
 
 .popup-content {
@@ -91,11 +95,10 @@ watch(() => props.coin, fetchNews, { immediate: true })
     color: black;
     padding: 2rem;
     border-radius: 12px;
-    width: 95%;
-    max-height: 70%;
-    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    max-height: none;        /* Remove height limit */
     box-sizing: border-box;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
 }
