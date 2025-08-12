@@ -122,11 +122,11 @@ const coinOptions = [
 ]
 
 const options = [
-    'Related News |',
-    'Analyze | ',
-    'Whitepaper | ',
-    'Whale Activity | ',
-    'Tokenomics | '
+    'Related News',
+    'Analyze',
+    'Whitepaper',
+    'Whale Activity',
+    'Tokenomics'
 ]
 
 const coinImagePath = computed(() => {

@@ -102,7 +102,7 @@
         </section>
       </div>
       <button class="continue-btn" :style="getCardStyle(3)" @click="handleContinue" :disabled="isExiting">
-        Continue
+        Exit
       </button>
     </template>
   </section>
