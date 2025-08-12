@@ -55,52 +55,52 @@ const loading = ref(false)
 const error = ref(null)
 
 // Put your real token here or get dynamically if needed
-const API_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW5naGFpIiwiaWF0IjoxNzU0OTY4ODY2LCJleHAiOjE3NTQ5Nzc4NjZ9.XenGo3xZ8sTzFzs6gFk9T1M5-oh5AJzhgSFajwJqUF0'
+const API_TOKEN = localStorage.getItem('jwt_token')
 
 const fetchNews = () => {
-  if (!props.coin) return
+    if (!props.coin) return
 
-  loading.value = true
-  error.value = null
-  newsData.value = []
+    loading.value = true
+    error.value = null
+    newsData.value = []
 
-  const body = {
-    topic_name: 'related_news',
-    provider_name: 'crypto_panic',
-    payload: {
-      type: 'coin',
-      currency: props.coin,
-      ...(props.filter ? { filter: props.filter } : {}),
-      ...(props.kind && props.kind !== 'all' ? { kind: props.kind } : {}),
-      test: true
+    const body = {
+        topic_name: 'related_news',
+        provider_name: 'crypto_panic',
+        payload: {
+            type: 'coin',
+            currency: props.coin,
+            ...(props.filter ? { filter: props.filter } : {}),
+            ...(props.kind && props.kind !== 'all' ? { kind: props.kind } : {}),
+            test: true
+        }
     }
-  }
 
-  fetch('http://localhost:8080/millionaire_project/service/trigger', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${API_TOKEN}`,
-      // other headers if needed
-    },
-    body: JSON.stringify(body)
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`)
-    }
-    return response.json()
-  })
-  .then(data => {
-    // Fix here: assign the nested results array
-    newsData.value = data?.data?.content?.data?.content?.results || []
-  })
-  .catch(err => {
-    error.value = err.message
-  })
-  .finally(() => {
-    loading.value = false
-  })
+    fetch('http://localhost:8080/millionaire_project/service/trigger', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_TOKEN}`,
+            // other headers if needed
+        },
+        body: JSON.stringify(body)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`)
+            }
+            return response.json()
+        })
+        .then(data => {
+            // Fix here: assign the nested results array
+            newsData.value = data?.data?.content?.data?.content?.results || []
+        })
+        .catch(err => {
+            error.value = err.message
+        })
+        .finally(() => {
+            loading.value = false
+        })
 }
 
 watch(

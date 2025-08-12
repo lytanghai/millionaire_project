@@ -3,3 +3,10 @@
 * {
   font-family: 'JetBrains Mono', monospace;
 }
+
+html, body {
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}

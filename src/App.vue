@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
     import Homepage from './components/Homepage.vue';
 </script>
 
@@ -6,5 +6,8 @@
   <Homepage/>
 </template>
 
+ -->
 
-
+<template>
+  <router-view />
+</template>
