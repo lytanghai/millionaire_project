@@ -3,25 +3,27 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { coinImageMap } from '@/assets/data/coinImageMap'
 import RelatedNews from '@/views/RelatedNews.vue'
 
-// RelatedNews.vue
 const showRelatedNews = ref(false)
-// 
+const customCoin = ref('')
+const selectedCoin = ref('')
+const step = ref(1)
+const theme = ref('dark')
 
-// handle pop up components
+const selectCustomCoin = () => {
+    if (customCoin.value.trim()) {
+        selectedCoin.value = customCoin.value.toUpperCase()
+    }
+}
+
 const handleOptionClick = (option) => {
-  if (option === 'Related News') {
-    showRelatedNews.value = true
-  }
-  // other options can be handled here
+    if (option === 'Related News') {
+        showRelatedNews.value = true
+    }
 }
 
 const closePopup = () => {
-  showRelatedNews.value = false
+    showRelatedNews.value = false
 }
-
-const theme = ref('dark')
-const selectedCoin = ref('')
-const step = ref(1) // 1: select coin, 2: show options
 
 const toggleTheme = () => {
     theme.value = theme.value === 'dark' ? 'light' : 'dark'
@@ -35,8 +37,8 @@ onMounted(() => {
 
 const modalBackground = computed(() => {
     return theme.value === 'dark'
-        ? 'rgba(255, 255, 255, 0.15)' // light modal on dark theme
-        : 'rgba(0, 0, 0, 0.7)'        // dark modal on light theme
+        ? 'rgba(255, 255, 255, 0.15)'
+        : 'rgba(0, 0, 0, 0.7)'
 })
 
 const updateBodyBackground = () => {
@@ -49,8 +51,13 @@ const updateBodyBackground = () => {
     }
 }
 
-watch(theme, () => {
-    updateBodyBackground()
+watch(theme, updateBodyBackground)
+
+watch(customCoin, (val) => {
+    if (val) selectedCoin.value = ''
+})
+watch(selectedCoin, (val) => {
+    if (val) customCoin.value = ''
 })
 
 const coinOptions = [
@@ -63,8 +70,8 @@ const coinOptions = [
 
 const options = [
     'Related News',
-    'Analysis',
-    'Data Overview',
+    'Analyze',
+    'Whitepaper',
     'Whale Activity',
     'Tokenomics'
 ]
@@ -74,10 +81,11 @@ const coinImagePath = computed(() => {
 })
 
 const goToOptions = () => {
-    if (selectedCoin.value) {
+    if (selectedCoin.value || customCoin.value.trim()) {
+        selectedCoin.value = selectedCoin.value || customCoin.value.toUpperCase()
         step.value = 2
     } else {
-        alert('Please select a coin first.')
+        alert('Please select or enter a coin first.')
     }
 }
 
@@ -96,19 +104,27 @@ const backToSelect = () => {
             <!-- Step 1: Select coin -->
             <div v-if="step === 1" class="coin-selector">
                 <h2 class="modal-title">Select a Coin</h2>
+
+                <!-- Existing select -->
                 <select v-model="selectedCoin" class="coin-select">
                     <option value="" disabled>Select a coin</option>
                     <option v-for="coin in coinOptions" :key="coin.symbol" :value="coin.symbol">
                         {{ coin.symbol }}
                     </option>
                 </select>
+
+                <!-- New input for custom coin -->
+                <input v-model="customCoin" class="coin-select custom" type="text" placeholder="Other Symbol"
+                    @keydown.enter.prevent="selectCustomCoin" />
+
                 <button class="continue-button" @click="goToOptions">Continue</button>
             </div>
 
             <!-- Step 2: Show coin and options -->
             <div v-else-if="step === 2" class="options-container">
                 <div class="coin-header">
-                    <img :src="coinImagePath" :alt="selectedCoin" class="coin-image" />
+                    <img v-if="coinImagePath" :src="coinImagePath" :alt="selectedCoin" class="coin-image" />
+
                     <h2 class="coin-name">{{ selectedCoin }}</h2>
                 </div>
                 <ul class="option-list">
@@ -200,6 +216,10 @@ body,
     background-color: inherit;
     color: #968f8f;
     outline: none;
+}
+
+.custom {
+    width: 330px;
 }
 
 .continue-button {

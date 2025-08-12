@@ -3,7 +3,7 @@
         <div class="popup-content">
             <h3 class="title-with-image">
                 Related News for {{ coin }}
-                <img :src="coinImageUrl" :alt="coin" class="coin-image" />
+                <img v-if="coinImageUrl" :src="coinImageUrl" :alt="coin" class="coin-image" />
             </h3>
 
             <div v-if="loading">🔄 Loading news...</div>
@@ -85,6 +85,7 @@ watch(() => props.coin, fetchNews, { immediate: true })
 
     padding: 1rem;
 }
+
 .popup-content {
     background-color: white;
     color: black;
@@ -131,6 +132,7 @@ watch(() => props.coin, fetchNews, { immediate: true })
     margin-top: 1rem;
     z-index: 1;
 }
+
 .close-button:hover {
     background-color: #1dd89a;
 }
@@ -178,5 +180,4 @@ hr {
         height: 80%;
     }
 }
-
 </style>
