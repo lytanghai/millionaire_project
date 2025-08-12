@@ -11,13 +11,17 @@
             <div v-else-if="error" class="error-message">❌ {{ error }}</div>
 
             <div v-else>
-                <div v-if="newsData.length === 0">No news found for {{ coin }}.</div>
+                <div v-if="newsData.length === 0" class="no-news-message">
+                    No news found for {{ coin }}.
+                </div>
 
-                <div v-for="item in newsData" :key="item.id" class="news-item">
-                    <p class="news-date">Date {{ formatDate(item.published_at) }}</p>
-                    <p class="news-title">Title {{ item.title }}</p>
-                    <p class="news-description">{{ item.description || 'No description available.' }}</p>
-                    <hr />
+                <div v-else>
+                    <div v-for="item in newsData" :key="item.id" class="news-item">
+                        <p class="news-date">Date {{ formatDate(item.published_at) }}</p>
+                        <p class="news-title">Title {{ item.title }}</p>
+                        <p class="news-description">{{ item.description || 'No description available.' }}</p>
+                        <hr />
+                    </div>
                 </div>
             </div>
 
@@ -26,13 +30,22 @@
     </div>
 </template>
 
+
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { coinImageMap } from '@/assets/data/coinImageMap.js'
 import { formatDate } from '@/assets/data/dateUtil'
 
 const props = defineProps({
-    coin: String
+    coin: String,
+    filter: {
+        type: String,
+        default: ''
+    },
+    kind: {
+        type: String,
+        default: 'all'
+    }
 })
 
 const coinImageUrl = computed(() => coinImageMap[props.coin] || '')
@@ -41,34 +54,62 @@ const newsData = ref([])
 const loading = ref(false)
 const error = ref(null)
 
-const API_TOKEN = import.meta.env.VITE_CRYPTOPANIC_API_KEY
-const fetchNews = async () => {
-    if (!props.coin) return
+// Put your real token here or get dynamically if needed
+const API_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0YW5naGFpIiwiaWF0IjoxNzU0OTY4ODY2LCJleHAiOjE3NTQ5Nzc4NjZ9.XenGo3xZ8sTzFzs6gFk9T1M5-oh5AJzhgSFajwJqUF0'
 
-    loading.value = true
-    error.value = null
-    newsData.value = []
+const fetchNews = () => {
+  if (!props.coin) return
 
-    try {
-        const url = `https://cryptopanic.com/api/developer/v2/posts/?auth_token=${API_TOKEN}&currencies=${props.coin}`
-        const response = await fetch(url)
+  loading.value = true
+  error.value = null
+  newsData.value = []
 
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`)
-        }
-
-        const data = await response.json()
-
-        newsData.value = data.results || []
-    } catch (err) {
-        error.value = err.message
-    } finally {
-        loading.value = false
+  const body = {
+    topic_name: 'related_news',
+    provider_name: 'crypto_panic',
+    payload: {
+      type: 'coin',
+      currency: props.coin,
+      ...(props.filter ? { filter: props.filter } : {}),
+      ...(props.kind && props.kind !== 'all' ? { kind: props.kind } : {}),
+      test: true
     }
+  }
+
+  fetch('http://localhost:8080/millionaire_project/service/trigger', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_TOKEN}`,
+      // other headers if needed
+    },
+    body: JSON.stringify(body)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`)
+    }
+    return response.json()
+  })
+  .then(data => {
+    // Fix here: assign the nested results array
+    newsData.value = data?.data?.content?.data?.content?.results || []
+  })
+  .catch(err => {
+    error.value = err.message
+  })
+  .finally(() => {
+    loading.value = false
+  })
 }
 
-watch(() => props.coin, fetchNews, { immediate: true })
+watch(
+    () => [props.coin, props.filter, props.kind],
+    fetchNews,
+    { immediate: true }
+)
 </script>
+
 
 <style scoped>
 .related-news-popup {
