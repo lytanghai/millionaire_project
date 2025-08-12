@@ -32,9 +32,11 @@
 
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, handleError } from 'vue'
 import { coinImageMap } from '@/assets/data/coinImageMap.js'
 import { formatDate } from '@/assets/data/dateUtil'
+
+import { handleAuthError } from '@/assets/data/common'
 
 const props = defineProps({
     coin: String,
@@ -96,7 +98,7 @@ const fetchNews = () => {
             newsData.value = data?.data?.content?.data?.content?.results || []
         })
         .catch(err => {
-            error.value = err.message
+            handleAuthError(err)
         })
         .finally(() => {
             loading.value = false

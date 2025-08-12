@@ -32,37 +32,34 @@ const selectCustomCoin = () => {
 }
 
 const handleOptionClick = (option) => {
-  console.log('Clicked option:', option)
+    console.log('Clicked option:', option)
 
-  if (option === 'Related News') {
-    showRelatedNewsFilters.value = true
-    showAnalyzePopup.value = false
-    showRelatedNews.value = false
-    return
-  }
-
-  if (option === 'Analyze') {
-    // Ensure a coin is selected
-    const coinParam = customCoin.value.trim()
-      ? customCoin.value.toUpperCase()
-      : selectedCoin.value
-    if (!coinParam) {
-      alert('Please select or enter a coin first.')
-      return
+    if (option === 'Related News') {
+        showRelatedNewsFilters.value = true
+        showAnalyzePopup.value = false
+        showRelatedNews.value = false
+        return
     }
-    showAnalyzePopup.value = true
-    showRelatedNewsFilters.value = false
+
+    if (option === 'Analyze') {
+        // Ensure a coin is selected
+        const coinParam = customCoin.value.trim()
+            ? customCoin.value.toUpperCase()
+            : selectedCoin.value
+        if (!coinParam) {
+            alert('Please select or enter a coin first.')
+            return
+        }
+        showAnalyzePopup.value = true
+        showRelatedNewsFilters.value = false
+        showRelatedNews.value = false
+        selectedCoin.value = coinParam
+        return
+    }
+
     showRelatedNews.value = false
-    selectedCoin.value = coinParam
-    return
-  }
-
-  // Handle other options here if needed
-
-  // Default fallback: hide all popups
-  showRelatedNews.value = false
-  showRelatedNewsFilters.value = false
-  showAnalyzePopup.value = false
+    showRelatedNewsFilters.value = false
+    showAnalyzePopup.value = false
 }
 
 const confirmRelatedNews = () => {
@@ -78,10 +75,6 @@ const closePopup = () => {
     showRelatedNews.value = false
     selectedFilter.value = ''
     selectedKind.value = 'all'
-}
-
-const toggleTheme = () => {
-    theme.value = theme.value === 'dark' ? 'light' : 'dark'
 }
 
 onMounted(() => {
@@ -110,12 +103,16 @@ const updateBodyBackground = () => {
 watch(theme, updateBodyBackground)
 
 watch(customCoin, (val) => {
-    if (val) selectedCoin.value = ''
-})
-watch(selectedCoin, (val) => {
-    if (val) customCoin.value = ''
+  if (val && selectedCoin.value !== 'other') {
+    selectedCoin.value = ''
+  }
 })
 
+watch(selectedCoin, (val) => {
+  if (val && val !== 'other') {
+    customCoin.value = ''
+  }
+})
 const coinOptions = [
     { name: 'Bitcoin', symbol: 'BTC' },
     { name: 'Binance', symbol: 'BNB' },
@@ -125,11 +122,11 @@ const coinOptions = [
 ]
 
 const options = [
-    'Related News',
-    'Analyze',
-    'Whitepaper',
-    'Whale Activity',
-    'Tokenomics'
+    'Related News |',
+    'Analyze | ',
+    'Whitepaper | ',
+    'Whale Activity | ',
+    'Tokenomics | '
 ]
 
 const coinImagePath = computed(() => {
@@ -137,10 +134,12 @@ const coinImagePath = computed(() => {
 })
 
 const goToOptions = () => {
-  if (selectedCoin.value || customCoin.value.trim()) {
-    selectedCoin.value = selectedCoin.value || customCoin.value.toUpperCase()
+  if (selectedCoin.value === 'other' && customCoin.value.trim()) {
+    selectedCoin.value = customCoin.value.toUpperCase()
+  }
+
+  if (selectedCoin.value) {
     step.value = 2
-    // Navigate to "/" (home)
     router.push('/')
   } else {
     alert('Please select or enter a coin first.')
@@ -157,20 +156,22 @@ const hoverIndex = ref(null)
 
 <template>
     <div :class="['app', theme]">
-
         <div class="modal" :style="{ backgroundColor: modalBackground }">
             <!-- Step 1: Select coin -->
             <div v-if="step === 1" class="coin-selector">
                 <h2 class="modal-title">Select a Coin</h2>
 
-                <select v-model="selectedCoin" class="coin-select">
+                <select v-model="selectedCoin" class="coin-select" style="text-align: center;">
                     <option value="" disabled>Select a coin</option>
                     <option v-for="coin in coinOptions" :key="coin.symbol" :value="coin.symbol">
                         {{ coin.symbol }}
                     </option>
+                    <option value="other">Other</option> <!-- Add 'Other' option -->
                 </select>
 
-                <input v-model="customCoin" class="coin-select custom" type="text" placeholder="Other Symbol"
+                <!-- Show input only if 'Other' selected -->
+                <input v-if="selectedCoin === 'other'" v-model="customCoin" style="text-align: center;"
+                    class="coin-select custom" type="text" placeholder="Enter custom symbol"
                     @keydown.enter.prevent="selectCustomCoin" />
 
                 <button class="continue-button" @click="goToOptions">Continue</button>
@@ -187,10 +188,7 @@ const hoverIndex = ref(null)
                         <li v-for="(option, index) in options" :key="option" class="option-item"
                             @mouseenter="hoverIndex = index" @mouseleave="hoverIndex = null"
                             style="position: relative;">
-                            <button
-                                class="option-button"
-                                @click.stop="() => handleOptionClick(option)"
-                            >
+                            <button class="option-button" @click.stop="() => handleOptionClick(option)">
                                 {{ option }}
                             </button>
                         </li>
@@ -242,361 +240,364 @@ const hoverIndex = ref(null)
 html,
 body,
 .app {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: inherit;
-  color: inherit;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: inherit;
+    color: inherit;
 }
 
 .app.dark {
-  background-color: #0d1117;
-  color: #fff;
+    background-color: #0d1117;
+    color: #fff;
 }
 
 .app.light {
-  background-color: #f3f4f6;
-  color: #111827;
+    background-color: #f3f4f6;
+    color: #111827;
 }
 
 /* Theme Toggle Button */
 .theme-toggle {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  color: inherit;
-  border: 1px solid currentColor;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  font-size: 1rem;
-  z-index: 1100;
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    color: inherit;
+    border: 1px solid currentColor;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 1rem;
+    z-index: 1100;
 }
 
 .theme-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Modal */
 .modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 2rem;
-  width: 90%;
-  max-width: 420px;
-  max-height: 90vh;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  color: inherit;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-sizing: border-box;
-  overflow-y: auto;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 420px;
+    max-height: 90vh;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 /* Blur background when overlay open */
 .blurred {
-  filter: blur(5px);
-  pointer-events: none; /* Prevent clicking underneath overlay */
-  user-select: none;
-  transition: filter 0.3s ease;
+    filter: blur(5px);
+    pointer-events: none;
+    /* Prevent clicking underneath overlay */
+    user-select: none;
+    transition: filter 0.3s ease;
 }
 
 /* Step 1 - Coin Selector */
 .coin-selector {
-  width: 100%;
-  text-align: center;
+    width: 100%;
+    text-align: center;
 }
 
 .coin-select,
 .custom {
-  width: 100%;
-  padding: 0.6rem 0.75rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 1rem;
-  background-color: inherit;
-  color: inherit;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.3s;
-  background-color: #333;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 1rem;
+    background-color: inherit;
+    color: inherit;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+    background-color: #333;
 }
 
 .coin-select:focus,
 .custom:focus {
-  border-color: #eb8b25;
+    border-color: #eb8b25;
 }
 
 .custom {
-  max-width: 330px;
-  margin-left: auto;
-  margin-right: auto;
+    max-width: 330px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .continue-button {
-  width: 100%;
-  max-width: 330px;
-  padding: 0.7rem 1.5rem;
-  background-color: #eb8b25;
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-top: 1rem;
-  user-select: none;
+    width: 100%;
+    max-width: 330px;
+    padding: 0.7rem 1.5rem;
+    background-color: #eb8b25;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 1rem;
+    user-select: none;
 }
 
 .continue-button:hover,
 .continue-button:focus {
-  background-color: #1d4ed8;
-  outline: none;
+    background-color: #1d4ed8;
+    outline: none;
 }
 
 /* Step 2 - Options */
 .step2-wrapper {
-  width: 100%;
-  max-width: 420px;
-  min-height: 320px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
+    width: 100%;
+    max-width: 420px;
+    min-height: 320px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
 }
 
 .options-container {
-  width: 100%;
-  position: relative;
-  z-index: 2;
+    width: 100%;
+    position: relative;
+    z-index: 2;
 }
 
 .coin-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .coin-image {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  object-fit: contain;
-  background: rgba(255, 255, 255, 0.1);
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .coin-name {
-  font-size: 1.6rem;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  user-select: none;
+    font-size: 1.6rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
 }
 
 .option-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1.5rem 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
 }
 
 .option-item {
-  position: relative;
+    position: relative;
 }
 
 /* Option Button */
 .option-button {
-  width: 100%;
-  text-align: left;
-  padding: 0.85rem 1.2rem;
-  font-size: 1.05rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background-color: #eb6a25;
-  color: white;
-  transition: background-color 0.3s ease;
-  user-select: none;
-  box-shadow: 0 2px 6px rgb(235 138 37 / 0.3);
+    width: 100%;
+    text-align: left;
+    padding: 0.85rem 1.2rem;
+    font-size: 1.05rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #eb6a25;
+    color: white;
+    transition: background-color 0.3s ease;
+    user-select: none;
+    box-shadow: 0 2px 6px rgb(235 138 37 / 0.3);
 }
 
 .option-button:hover:not(:disabled),
 .option-button:focus:not(:disabled) {
-  background-color: #1dd89a;
-  outline: none;
+    background-color: #1dd89a;
+    outline: none;
 }
 
 .option-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background-color: #a06e00;
-  box-shadow: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #a06e00;
+    box-shadow: none;
 }
 
 /* Back Button */
 .back-button {
-  padding: 0.6rem 1.2rem;
-  background-color: transparent;
-  border: 1.5px solid currentColor;
-  border-radius: 10px;
-  color: inherit;
-  cursor: pointer;
-  font-size: 1.1rem;
-  transition: background-color 0.3s ease;
-  width: 100%;
-  max-width: 160px;
-  margin: 0 auto;
-  display: block;
-  user-select: none;
+    padding: 0.6rem 1.2rem;
+    background-color: transparent;
+    border: 1.5px solid currentColor;
+    border-radius: 10px;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    max-width: 160px;
+    margin: 0 auto;
+    display: block;
+    user-select: none;
 }
 
 .back-button:hover:not(:disabled),
 .back-button:focus:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.15);
-  outline: none;
+    background-color: rgba(255, 255, 255, 0.15);
+    outline: none;
 }
 
 .back-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 /* Overlay popup */
 .overlay {
-  position: fixed;
-  inset: 0;
-  background-color: var(--overlay-bg, rgba(0, 0, 0, 0.7));
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1200;
-  padding: 1rem;
-  box-sizing: border-box;
+    position: fixed;
+    inset: 0;
+    background-color: var(--overlay-bg, rgba(0, 0, 0, 0.7));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1200;
+    padding: 1rem;
+    box-sizing: border-box;
 }
 
 .overlay-content {
-  background: rgba(255, 255, 255, 0.97);
-  border-radius: 20px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 420px;
-  box-sizing: border-box;
-  color: #222;
-  box-shadow: 0 0 25px rgba(0, 0, 0, 0.35);
-  max-height: 90vh;
-  overflow-y: auto;
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 20px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 420px;
+    box-sizing: border-box;
+    color: #222;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.35);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .overlay-content h3 {
-  margin-top: 0;
-  margin-bottom: 1.25rem;
-  color: #eb8b25;
-  font-weight: 700;
-  font-size: 1.4rem;
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+    color: #eb8b25;
+    font-weight: 700;
+    font-size: 1.4rem;
 }
 
 .overlay-content label {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1.25rem;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #333;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.25rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #333;
 }
 
 .overlay-content select {
-  margin-top: 0.4rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  border: 1.5px solid #ccc;
-  font-size: 1.05rem;
-  user-select: none;
-  cursor: pointer;
+    margin-top: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1.5px solid #ccc;
+    font-size: 1.05rem;
+    user-select: none;
+    cursor: pointer;
 }
 
 .filter-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.7rem;
-  margin-top: 1.25rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.7rem;
+    margin-top: 1.25rem;
 }
 
 .filter-buttons button {
-  padding: 0.65rem 1.25rem;
-  font-size: 1.05rem;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  font-weight: 700;
-  transition: background-color 0.25s ease;
-  user-select: none;
-  color: white;
+    padding: 0.65rem 1.25rem;
+    font-size: 1.05rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.25s ease;
+    user-select: none;
+    color: white;
 }
 
 .filter-buttons button:first-child {
-  background-color: #ef4444;
+    background-color: #ef4444;
 }
 
 .filter-buttons button:first-child:hover {
-  background-color: #b91c1c;
+    background-color: #b91c1c;
 }
 
 .filter-buttons button:last-child {
-  background-color: #22c55e;
+    background-color: #22c55e;
 }
 
 .filter-buttons button:last-child:hover {
-  background-color: #15803d;
+    background-color: #15803d;
 }
 
 /* Scrollbar for modal and overlay content */
 .modal::-webkit-scrollbar,
 .overlay-content::-webkit-scrollbar,
 .step2-wrapper::-webkit-scrollbar {
-  width: 10px;
+    width: 10px;
 }
 
 .modal::-webkit-scrollbar-thumb,
 .overlay-content::-webkit-scrollbar-thumb,
 .step2-wrapper::-webkit-scrollbar-thumb {
-  background-color: rgba(235, 139, 37, 0.6);
-  border-radius: 10px;
+    background-color: rgba(235, 139, 37, 0.6);
+    border-radius: 10px;
 }
 
 .modal::-webkit-scrollbar-track,
 .overlay-content::-webkit-scrollbar-track,
 .step2-wrapper::-webkit-scrollbar-track {
-  background-color: transparent;
+    background-color: transparent;
 }
 
 /* Responsive tweaks */
 @media (max-width: 440px) {
-  .description-container {
-    display: none;
-  }
-  .modal {
-    padding: 1rem 1.25rem;
-  }
-  .overlay-content {
-    padding: 1rem 1.25rem;
-  }
+    .description-container {
+        display: none;
+    }
+
+    .modal {
+        padding: 1rem 1.25rem;
+    }
+
+    .overlay-content {
+        padding: 1rem 1.25rem;
+    }
 }
 </style>
