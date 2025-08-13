@@ -89,10 +89,9 @@ onMounted(() => {
 })
 
 const modalBackground = computed(() => {
-    // return theme.value === 'dark'
-    //     ? 'rgba(255, 255, 255, 0.15)'
-    //     : 'rgba(0, 0, 0, 0.7)'
-    return 'rgba(255, 255, 255, 0.15)';
+    return theme.value === 'dark'
+        ? 'rgba(255, 255, 255, 0.15)'
+        : 'rgba(0, 0, 0, 0.7)'
 })
 
 
@@ -234,11 +233,11 @@ const hoverIndex = ref(null)
                 </div>
             </div>
         </div>
-        <button class="option-button" @click="toggleTestApi">
+        <!-- <button class="option-button" @click="toggleTestApi">
             {{ showTestApi ? 'Hide Test API' : 'Call Test API' }}
-        </button>
+        </button> -->
 
-        <TestApi v-if="showTestApi" />
+        <!-- <TestApi v-if="showTestApi" /> -->
         <RelatedNews v-if="showRelatedNews" :coin="selectedCoin" :filter="selectedFilter" :kind="selectedKind"
             @close="closePopup" />
         <Analyze v-if="showAnalyzePopup" :coin="selectedCoin" />
@@ -255,7 +254,7 @@ body,
     padding: 0;
     overflow: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: inherit;
+    /* background-color: inherit; */
     color: inherit;
 }
 
