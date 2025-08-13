@@ -1,5 +1,6 @@
 <script setup>
-const axios = require('axios');
+import axios from 'axios'
+
 
 const apiKey = '57cd5930-852b-478f-939e-0c96c37b0016';
 const url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/market-pairs/latest';
