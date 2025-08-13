@@ -89,9 +89,10 @@ onMounted(() => {
 })
 
 const modalBackground = computed(() => {
-    return theme.value === 'dark'
-        ? 'rgba(255, 255, 255, 0.15)'
-        : 'rgba(0, 0, 0, 0.7)'
+    // return theme.value === 'dark'
+    //     ? 'rgba(255, 255, 255, 0.15)'
+    //     : 'rgba(0, 0, 0, 0.7)'
+    return 'rgba(255, 255, 255, 0.15)';
 })
 
 
