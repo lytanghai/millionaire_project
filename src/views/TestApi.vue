@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import { backend_url } from '@/assets/data/common'
 
 const response = ref(null)
 const error = ref(null)
@@ -16,8 +17,9 @@ const callTestApi = async () => {
   response.value = null
 
   try {
+    const url = backend_url + '/service/trigger';
     const res = await axios.post(
-      'http://localhost:8080/millionaire_project/service/trigger',
+      url,
       {
         topic_name: 'related_news',
         provider_name: 'coin_market_cap',
