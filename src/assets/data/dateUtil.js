@@ -18,3 +18,9 @@ export function formatDateToGMT7(isoString) {
   const gmt7Date = new Date(date.getTime() + 7 * 60 * 60 * 1000)
   return gmt7Date.toISOString().replace('T', ' ').replace('Z', '') // show YYYY-MM-DD HH:mm:ss (without Z)
 }
+
+export const formatGMT = () => {
+  const now = new Date()
+  const gmt7Time = new Date(now.getTime() + 7 * 60 * 60 * 1000)
+  return gmt7Time.toISOString().replace('T', ' ').slice(0, 19)
+}

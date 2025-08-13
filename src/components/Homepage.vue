@@ -157,10 +157,60 @@ const backToSelect = () => {
 
 const hoverIndex = ref(null)
 
+// Trading sessions with approximate volume ranking (high to low)
+const tradingSessions = [
+    { name: 'Tokyo', startUTC: 0, endUTC: 8, time: '00:00 - 08:00 GMT', volume: 'Medium' },
+    { name: 'London', startUTC: 8, endUTC: 16, time: '08:00 - 16:00 GMT', volume: 'High' },
+    { name: 'New York', startUTC: 13, endUTC: 21, time: '13:00 - 21:00 GMT', volume: 'High' },
+]
+
+const currentGMT7 = ref('') // store current GMT+7 string
+const formatGMT7 = () => {
+    const now = new Date()
+    const gmt7 = new Date(now.getTime() + 7 * 60 * 60 * 1000)
+    return gmt7
+}
+
+const updateActiveSession = () => {
+    const now = formatGMT7()
+    const hour = now.getHours() // local hour in GMT+7
+    // Sessions in GMT+7
+    if (hour >= 7 && hour < 15) {
+        activeSession.value = 'Tokyo'
+    } else if (hour >= 15 && hour < 23) {
+        activeSession.value = 'London'
+    } else {
+        activeSession.value = 'New York'
+    }
+    currentGMT7.value = now.toISOString().replace('T', ' ').slice(0, 19)
+}
+
+const activeSession = ref('')
+
+// Start interval
+onMounted(() => {
+    updateActiveSession()
+    setInterval(() => {
+        updateActiveSession()
+    }, 1000)
+})
+
 </script>
 
 <template>
     <div :class="['app', theme]">
+        <div class="trading-timetable">
+            <h4>Crypto Market Sessions</h4>
+            <ul>
+                <li v-for="session in tradingSessions" :key="session.name"
+                    :class="{ active: session.name === activeSession }">
+                    <strong>{{ session.name }}:</strong> {{ session.time }} ({{ session.volume }})
+                </li>
+            </ul>
+            <div class="current-time">
+                {{ currentGMT7 }}
+            </div>
+        </div>
         <div class="modal" :style="{ backgroundColor: modalBackground }">
             <!-- Step 1: Select coin -->
             <div v-if="step === 1" class="coin-selector">
@@ -254,7 +304,6 @@ body,
     padding: 0;
     overflow: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    /* background-color: inherit; */
     color: inherit;
 }
 
@@ -268,7 +317,6 @@ body,
     color: #111827;
 }
 
-/* Theme Toggle Button */
 .theme-toggle {
     position: fixed;
     top: 1rem;
@@ -286,6 +334,24 @@ body,
 
 .theme-toggle:hover {
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+.trading-timetable li.active {
+    color: #ffb547;
+    font-weight: bold;
+    position: relative;
+}
+
+.trading-timetable li.active::before {
+    content: '▶';
+    color: #ffb547;
+    margin-right: 0.4rem;
+}
+
+.current-time {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    color: #ccc;
 }
 
 /* Modal */
