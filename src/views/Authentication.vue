@@ -43,6 +43,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { setToken } from '@/assets/token'  // Your token helper functions
+import { backend_url } from '@/assets/data/common';
 
 const router = useRouter()
 
@@ -71,7 +72,7 @@ const handleSubmit = async () => {
     appVersion.value = ''
 
     try {
-        const res = await fetch('http://localhost:8080/millionaire_project/public/auth/login', {
+        const res = await fetch(backend_url + '/public/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: username.value, password: password.value }),
@@ -115,17 +116,13 @@ const handleSubmit = async () => {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Center the login-wrapper vertically and horizontally */
 .login-wrapper-container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    /* Full viewport height */
     padding: 1rem;
-    /* some padding on small screens */
     background: #0f172a;
-    /* optional: match your background */
     box-sizing: border-box;
 }
 
@@ -210,7 +207,6 @@ button:hover:not(:disabled) {
     color: #a7f3d0;
 }
 
-/* Spinner */
 .spinner {
     border: 3px solid rgba(255, 255, 255, 0.3);
     border-top: 3px solid white;

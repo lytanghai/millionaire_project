@@ -1,258 +1,208 @@
-<template>
-  <section class="parent analyze-section" :class="{ 'fade-out': isExiting }">
-    <!-- Loader -->
-    <div v-if="showLoader" class="loader-banner">
-      <h1>Analyzing<span class="dots"><span>.</span><span>.</span><span>.</span></span></h1>
-      <div class="particles">
-        <span class="particle" v-for="n in 8" :key="n"></span>
-      </div>
-    </div>
-
-    <!-- Cards + button -->
-    <template v-else>
-      <div class="div1 card" :style="getCardStyle(0)">
-        <h2>General Information</h2>
-        <p><strong>Name:</strong> {{ general.name }}</p>
-        <p><strong>Symbol:</strong> {{ general.symbol }}</p>
-        <p><strong>Global Rank:</strong> {{ general.rank }}</p>
-        <p><strong>Currently Active:</strong> {{ general.currentlyAction }}</p>
-        <p><strong>New Coin:</strong> {{ general.isNew }}</p>
-        <p><strong>Exchange Type:</strong> {{ general.exchangeType }}</p>
-        <p><strong>Network / Blockchain:</strong> {{ general.network || 'N/A' }}</p>
-        <p><strong>Type:</strong> {{ general.type }}</p>
-        <p><strong>Platform:</strong> {{ general.type }}</p>
-        <p><strong>Started at:</strong> xxxxxxxxxx</p>
-        <p><strong>Organzation Structure:</strong> {{ general.type }}</p>
-        <p><strong>Description:</strong> {{ general.type }}</p>
-        <!-- Image Logo -->
-      </div>
-
-      <div class="div2 card" :style="getCardStyle(1)">
-        <h2>Market Information</h2>
-        <p><strong>Current Price:</strong> ${{ market.currentPrice }}</p>
-        <p><strong>All Time High:</strong> ${{ market.ath }}</p>
-        <p><strong>All Time Low:</strong> ${{ market.atl }}</p>
-        <p><strong>Market Cap:</strong> {{ market.marketCap }}</p>
-        <p><strong>Volume:</strong> {{ market.volume }}</p>
-        <p>
-          <strong>Last 24h:</strong> Trades: {{ market.trades }}, Low: ${{ market.low24h }}, High: ${{ market.high24h }}
-        </p>
-        <p><strong>Volatility:</strong> {{ volatilityPercent.toFixed(2) }}%</p>
-      </div>
-
-      <div class="div3 card" :style="getCardStyle(2)">
-        <h2>Development, Community & Risks</h2>
-        <section>
-          <h3>Development & Community</h3>
-          <ul>
-            <li>Developer Activity: {{ devCommunity.developerActivity }}</li>
-            <li>Team: {{ devCommunity.team }}</li>
-            <li>Community Size: {{ devCommunity.communitySize }}</li>
-            <li>Partnerships: {{ devCommunity.partnerships }}</li>
-          </ul>
-        </section>
-        <section>
-          <h3>Risk Factors</h3>
-          <ul>
-            <li>Regulation: {{ risks.regulation }}</li>
-            <li>Concentration: {{ risks.concentration }}</li>
-            <li>Security History: {{ risks.securityHistory }}</li>
-            <li>Liquidity Risk: {{ risks.liquidityRisk }}</li>
-          </ul>
-        </section>
-
-      </div>
-
-      <div class="div4 card" :style="getCardStyle(3)">
-        <h2>Crypto Exchanges</h2>
-        <!-- GET https://api.coinpaprika.com/v1/coins/{coin_id}/markets -->
-        <section>
-          <h3>Exchanges</h3>
-          <table class="exchange-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Value</th>
-                <th>Trust</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Binance</td>
-                <td>934,343,232</td>
-                <td>10/10</td>
-              </tr>
-              <tr>
-                <td>Bitget</td>
-                <td>234,123,321</td>
-                <td>8/10</td>
-              </tr>
-              <tr>
-                <td>Gate</td>
-                <td>120,999,111</td>
-                <td>7/10</td>
-              </tr>
-              <tr>
-                <td>KuCoin</td>
-                <td>89,876,543</td>
-                <td>7.5/10</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-      </div>
-      <button class="continue-btn" :style="getCardStyle(3)" @click="handleContinue" :disabled="isExiting">
-        Exit
-      </button>
-    </template>
-  </section>
-</template>
-
-
-<script setup>
-import { reactive, computed, ref, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-
-const router = useRouter()
-const route = useRoute()
-
-const coin = route.query.coin || ''
-
-function revealCardsSequentially() {
-  const totalItems = 4; // 3 cards + 1 button
-  let current = 0;
-  const interval = setInterval(() => {
-    visibleIndex.value = current;
-    current++;
-    if (current >= totalItems) clearInterval(interval);
-  }, 400); // each 400ms
-}
-
-function getCardStyle(index) {
-  const isVisible = visibleIndex.value >= index;
-  return {
-    opacity: isVisible ? 1 : 0,
-    transform: isVisible ? 'translateY(0)' : 'translateY(12px)',
-    transition: 'opacity 0.6s ease, transform 0.6s ease',
-  };
-}
-
-const general = reactive({
-  name:'Bitcoin',
-  symbol: 'USDT',
-  rank: 3,
-  currentlyAction: 'YES',
-  isNew:'NO',
-  exchangeType: 'Crypto',
-  network: 'Ethereum, Tron, BSC',
-  type: 'Token',
-})
-
-const market = reactive({
-  currentPrice: 1.0,
-  ath: 1.32,
-  atl: 0.85,
-  marketCap: '70B',
-  volume: '20B',
-  trades: 20000,
-  low24h: 0.98,
-  high24h: 1.02,
-  previousClose: 1.01,
-  dayHigh: 1.02,
-  dayLow: 0.98,
-})
-
-const volatilityPercent = computed(() => {
-  const { dayHigh, dayLow, previousClose } = market
-  if (previousClose === 0) return 0
-  return ((dayHigh - dayLow) / previousClose) * 100
-})
-
-const devCommunity = reactive({
-  developerActivity: 'Active on GitHub, 500+ commits last month',
-  team: 'Experienced blockchain engineers and advisors',
-  communitySize: '500k Telegram, 200k Twitter followers',
-  partnerships: 'Binance, Coinbase, Chainlink',
-})
-
-const risks = reactive({
-  regulation: 'Low risk but under monitoring',
-  concentration: 'Top 10 wallets hold 60%',
-  securityHistory: 'No major hacks reported',
-  liquidityRisk: 'High liquidity, low risk',
-})
-
-// Control showing loader and cards
-const showLoader = ref(true)
-const visibleIndex = ref(-1) // -1 means none visible yet
-const isExiting = ref(false)
-
-onMounted(() => {
-  setTimeout(() => {
-    showLoader.value = false
-    revealCardsSequentially()
-  }, 2500) // Show loader for 2.5 seconds
-})
-
-const handleContinue = () => {
-  if (isExiting.value) return
-  isExiting.value = true
-  setTimeout(() => {
-    router.push('/')
-    window.location.reload()
-  }, 2000)
-}
-</script>
-
 <style scoped>
-.parent {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 20px;
-  padding: 20px;
-  min-height: 100vh;
-  width: 100vw;
-  box-sizing: border-box;
+.slideshow-container {
+  position: relative;
+  width: 98vw;
+  height: 98vh;
+  max-width: 1100px;
+  max-height: 1000px;
+  margin: auto;
+  padding: 32px;
   background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
   background-size: 400% 400%;
   animation: gradientShift 12s ease infinite;
-  position: relative;
-  overflow-x: hidden;
-  transition: opacity 1.5s ease;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 24px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .fade-out {
   opacity: 0;
+  transition: opacity 1.5s ease;
 }
 
-/* Gradient animation */
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 50% 50%;
-  }
-
-  75% {
-    background-position: 75% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  text-align: left;
+  scrollbar-width: thin;
+  scrollbar-color: #38bdf8 transparent;
 }
 
-/* Loader Banner */
+.card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card::-webkit-scrollbar-thumb {
+  background-color: #38bdf8;
+  border-radius: 4px;
+}
+
+.market-info {
+  display: flex;
+  gap: 2rem;
+}
+
+.market-col {
+  flex: 1;
+}
+
+/* Headings */
+h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+h3 {
+  margin-bottom: 10px;
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+p,
+li {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: #cbd5e1;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+ul li::before {
+  content: "•";
+  color: #38bdf8;
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+.coin-logo-wrapper {
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center;     /* center vertically if needed */
+  margin-bottom: 1rem;
+  background-color: white;
+  padding: 0.3rem;
+  border-radius: 50%;
+  width: 60px;  /* smaller size */
+  height: 60px; /* smaller size */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.coin-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+
+.fire-brush-bg {
+  display: inline-block;
+  padding: 0 12px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(45deg, rgb(65, 176, 111), #7da871, #ffd700);
+  clip-path: polygon(5% 0%, 95% 0%, 100% 20%, 100% 80%, 95% 100%, 5% 100%, 0% 80%, 0% 20%);
+  -webkit-clip-path: polygon(5% 0%, 95% 0%, 100% 20%, 100% 80%, 95% 100%, 5% 100%, 0% 80%, 0% 20%);
+  box-shadow: 0 0 10px 2px rgba(255, 69, 0, 0.7);
+  user-select: none;
+}
+
+.exchange-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #cbd5e1;
+}
+
+.exchange-table th,
+.exchange-table td {
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: left;
+}
+
+.exchange-table th {
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.exchange-table tr:hover {
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  width: 100%;
+  max-width: 1100px;
+  padding-top: 20px;
+  box-sizing: border-box;
+}
+
+.nav-buttons button {
+  background: #3b82f6;
+  color: white;
+  font-weight: 700;
+  padding: 16px 32px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  font-size: 1.15rem;
+  user-select: none;
+}
+
+.nav-buttons button:disabled {
+  background: rgba(59, 130, 246, 0.5);
+  cursor: not-allowed;
+}
+
+.nav-buttons button:not(:disabled):hover {
+  background: #2563eb;
+}
+
+/* Exit button styling */
+.exit-btn {
+  background: #ef4444;
+  color: white;
+  font-weight: 700;
+  padding: 16px 32px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 1.15rem;
+  user-select: none;
+  transition: background-color 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.exit-btn:hover {
+  background: #b91c1c;
+}
+
+/* Loader styling */
 .loader-banner {
-  grid-column: 1 / -1;
-  padding: 0;
   color: #f1f5f9;
   user-select: none;
-  position: relative;
-  overflow: visible;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -260,15 +210,6 @@ const handleContinue = () => {
   height: 100vh;
   width: 100vw;
   text-align: center;
-}
-
-
-.loader-banner h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin: 0;
-  display: inline-block;
-  letter-spacing: 0.04em;
 }
 
 .dots span {
@@ -303,8 +244,6 @@ const handleContinue = () => {
     opacity: 1;
   }
 }
-
-/* Particles animation */
 
 .particles {
   margin-top: 1.5rem;
@@ -352,136 +291,264 @@ const handleContinue = () => {
   }
 }
 
-/* Card styling */
-.card {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 20px;
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.6s ease;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-}
-
-/* Headings & text */
-h2 {
-  margin-top: 0;
-  margin-bottom: 16px;
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: #ffffff;
-}
-
-h3 {
-  margin-top: 16px;
-  margin-bottom: 8px;
-  font-weight: 600;
-  font-size: 1rem;
-  color: #f1f5f9;
-}
-
-p {
-  margin: 6px 0;
-  color: #cbd5e1;
-  font-size: 0.95rem;
-}
-
-strong {
-  color: #ffffff;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-li {
-  margin-bottom: 6px;
-  font-size: 0.9rem;
-  color: #cbd5e1;
-  display: flex;
-  align-items: center;
-}
-
-li::before {
-  content: "•";
-  color: #38bdf8;
-  margin-right: 8px;
-  font-size: 1.2rem;
-}
-
-.exchange-table {
-  width: 100%;
-  border-collapse: collapse;
-  color: #cbd5e1;
-  font-size: 0.95rem;
-  margin-top: 8px;
-}
-
-.exchange-table th,
-.exchange-table td {
-  padding: 8px 12px;
-  text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.exchange-table th {
-  color: #38bdf8;
-  font-weight: 600;
-}
-
-.exchange-table tr:hover {
-  background: rgba(56, 189, 248, 0.1);
-}
-
-/* Continue button styling */
-.continue-btn {
-  grid-column: 1 / -1;
-  background: linear-gradient(90deg, #f88238, #3b82f6);
-  border: none;
-  border-radius: 12px;
-  color: #ffffff;
-  font-size: 1.3rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.6s ease;
-}
-
-.continue-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
-}
-
-/* Mobile tweaks */
+/* Responsive tweaks */
 @media (max-width: 640px) {
-  .parent {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    padding: 14px;
-    height: 100px;
+  .slideshow-container {
+    margin-top: 10%;
+    width: 98vw;
+    height: 90vh;
+    padding: 20px;
   }
 
   .card {
-    padding: 16px;
+    padding: 20px;
   }
 
-  h2 {
-    font-size: 1.1rem;
+  .nav-buttons button {
+    padding: 14px 24px;
+    font-size: 1rem;
   }
 
-  h3 {
-    font-size: 0.95rem;
+  .exit-btn {
+    padding: 12px 24px;
+    font-size: 1rem;
   }
+}
 
-  .loader-banner h1 {
-    font-size: 1.8rem;
+@media (max-width: 600px) {
+  .market-info {
+    flex-direction: column;
   }
 }
 </style>
+
+<template>
+  <section class="slideshow-container" :class="{ 'fade-out': isExiting }">
+    <!-- Loader -->
+    <div v-if="showLoader" class="loader-banner">
+      <h1>Analyzing<span class="dots"><span>.</span><span>.</span><span>.</span></span></h1>
+      <div class="particles">
+        <span class="particle" v-for="n in 8" :key="n"></span>
+      </div>
+    </div>
+
+    <!-- Slideshow Cards -->
+    <template v-else>
+      <!-- Slide content -->
+      <div class="card">
+        <template v-if="currentSlide === 0">
+          <h2>General Information</h2>
+          <!-- Coin Logo -->
+          <div v-if="apiData.logo" class="coin-logo-wrapper">
+            <img :src="apiData.logo" :alt="apiData.symbol_name || 'Coin Logo'" class="coin-logo" />
+          </div>
+
+          <p><strong>Name:</strong> {{ apiData.symbol_name || '*Information Unavailable' }}</p>
+          <p><strong>Symbol:</strong> {{ apiData.symbol || '*Information Unavailable' }}</p>
+          <p><strong>Rank:</strong> <span class="fire-brush-bg">{{ apiData.rank || '*Information Unavailable' }}</span> </p>
+          <p><strong>Layer:</strong> {{ apiData.id || '*Information Unavailable' }} | {{ apiData.name || '*Information Unavailable' }} </p>
+          <p><strong>Currently Active:</strong> {{ apiData.is_active ? 'Yes' : 'No' }}</p>
+          <p><strong>New Coin:</strong> {{ apiData.is_new ? 'Yes' : 'No' }}</p>
+          <p><strong>Type:</strong> {{ apiData.type || '*Information Unavailable' }}</p>
+          <p><strong>Open Source:</strong> {{ apiData.open_source === true ? 'YES' : 'NO' || '*Information Unavailable' }}</p>
+          <p><strong>Started at:</strong> {{ formatDateToGMT7(apiData.started_at) || '*Information Unavailable' }}</p>
+          <p><strong>Organization Structure:</strong> {{ apiData.org_structure || '*Information Unavailable' }}</p>
+          <p><strong>Hash Algorithm:</strong> {{ apiData.hash_algorithm || '*Information Unavailable' }}</p>
+          <p><strong>Description:</strong></p>
+          <div v-html="apiData.coin_description || '---'"></div>
+        </template>
+
+        <template v-else-if="currentSlide === 1">
+          <h2>Development, Community & Risks</h2>
+          <section>
+            <h3>Development & Community</h3>
+            <ul>
+              <section v-if="apiData.team && apiData.team.length">
+                <h3>Team Members</h3>
+                <ul>
+                  <li v-for="member in apiData.team" :key="member.id">
+                    {{ member.name }} — {{ member.position }}
+                  </li>
+                </ul>
+              </section>
+            </ul>
+          </section>
+          <section>
+            <h3>Risk Factors</h3>
+
+            <h4>Explorer</h4>
+            <ul>
+              <li v-for="(url, name) in apiData.explorer" :key="'explorer-' + name">
+                <a style="text-decoration: none; color: #fafafa;" :href="url" target="_blank">{{ name }}</a>
+              </li>
+            </ul>
+
+            <h4>Links</h4>
+            <ul>
+              <li v-for="(url, name) in apiData.link_extended" :key="'link-' + name">
+                <a style="text-decoration: none; color: #fafafa;" :href="url" target="_blank">{{ name }}</a>
+              </li>
+            </ul>
+          </section>
+
+        </template>
+
+        <template v-else-if="currentSlide === 2">
+          <h2>Market Information</h2>
+          <div class="market-info">
+            <div class="market-col">
+              <p><strong>Current Price:</strong> --- </p>
+              <p><strong>All Time High:</strong> --- </p>
+              <p><strong>All Time Low:</strong> --- </p>
+              <p><strong>Low 24h:</strong> --- </p>
+              <p><strong>High 24h:</strong> --- </p>
+            </div>
+            <div class="market-col">
+              <p><strong>Market Cap:</strong> --- </p>
+              <p><strong>Volume:</strong> --- </p>
+              <p><strong>Last 24h Trades:</strong> --- </p>
+              <p><strong>Volatility:</strong> --- </p>
+            </div>
+          </div>
+        </template>
+
+
+        <template v-else-if="currentSlide === 3">
+          <h2>Crypto Exchanges</h2>
+          <table class="exchange-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Value</th>
+                <th>Trust</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Binance</td>
+                <td>---</td>
+                <td>---</td>
+              </tr>
+              <tr>
+                <td>Bitget</td>
+                <td>---</td>
+                <td>---</td>
+              </tr>
+              <tr>
+                <td>Gate</td>
+                <td>---</td>
+                <td>---</td>
+              </tr>
+              <tr>
+                <td>KuCoin</td>
+                <td>---</td>
+                <td>---</td>
+              </tr>
+            </tbody>
+          </table>
+        </template>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="nav-buttons">
+        <button @click="prevSlide" :disabled="currentSlide === 0">Previous</button>
+
+        <template v-if="currentSlide !== maxSlide">
+          <button @click="nextSlide" :disabled="currentSlide === maxSlide">Next</button>
+        </template>
+
+        <template v-else>
+          <button class="exit-btn" @click="exitToHome">Exit</button>
+        </template>
+      </div>
+    </template>
+  </section>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { formatDateToGMT7 } from '@/assets/data/dateUtil';
+import { backend_url } from '@/assets/data/common';
+import axios from 'axios';
+
+// Receive coin as a prop from parent
+const props = defineProps({
+  coin: {
+    type: String,
+    required: true
+  }
+})
+
+const showLoader = ref(true);
+const isExiting = ref(false);
+
+const currentSlide = ref(0);
+const maxSlide = 3;
+
+const apiData = ref(null);
+const ohlcData = ref({});
+const errorMsg = ref('');
+
+
+const jwtToken = localStorage.getItem('token');
+
+function triggerApi(topicOperation, targetRef) {
+  const url = backend_url + '/service/trigger';
+  const payload = {
+    topic_name: 'analyze',
+    provider_name: 'coin_paprika',
+    payload: {
+      topic_operation: topicOperation,
+      coin: props.coin,
+    },
+  };
+  const headers = {
+    Authorization: `Bearer ${jwtToken}`,
+    'Content-Type': 'application/json',
+  };
+
+  showLoader.value = true;
+
+  axios.post(url, payload, { headers })
+    .then(response => {
+
+      if (response.data.status === 'success') {
+        targetRef.value = response.data.data.content;
+      } else {
+        errorMsg.value = `API returned status: ${response.data.status}`;
+      }
+    })
+    .catch(error => {
+      errorMsg.value = `Failed to fetch ${topicOperation} data: ${error.message}`;
+    })
+    .finally(() => {
+      showLoader.value = false;
+    });
+}
+
+onMounted(() => {
+  triggerApi('GET_COIN_DETAIL', apiData);
+  triggerApi('GET_TODAY_OHLC', ohlcData);
+});
+
+// Coin Market Cap API
+
+
+
+
+function nextSlide() {
+  if (currentSlide.value < maxSlide) currentSlide.value++;
+}
+
+function prevSlide() {
+  if (currentSlide.value > 0) currentSlide.value--;
+}
+
+function exitToHome() {
+  if (isExiting.value) return;
+  isExiting.value = true;
+  setTimeout(() => {
+    window.location.reload();
+  }, 100);
+}
+</script>

@@ -35,7 +35,7 @@
 import { ref, computed, watch, handleError } from 'vue'
 import { coinImageMap } from '@/assets/data/coinImageMap.js'
 import { formatDate } from '@/assets/data/dateUtil'
-
+import { backend_url } from '@/assets/data/common'
 import { handleAuthError } from '@/assets/data/common'
 
 const props = defineProps({
@@ -78,7 +78,7 @@ const fetchNews = () => {
         }
     }
 
-    fetch('http://localhost:8080/millionaire_project/service/trigger', {
+    fetch(backend_url + '/service/trigger', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

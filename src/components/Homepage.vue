@@ -5,6 +5,13 @@ import RelatedNews from '@/views/RelatedNews.vue'
 import Analyze from '@/views/Analyze.vue'
 import { useRouter } from 'vue-router'
 
+// Test only
+import TestApi from '@/views/TestApi.vue'
+const showTestApi = ref(false)
+const toggleTestApi = () => {
+    showTestApi.value = !showTestApi.value
+}
+
 const router = useRouter()
 
 const showRelatedNews = ref(false)
@@ -32,8 +39,6 @@ const selectCustomCoin = () => {
 }
 
 const handleOptionClick = (option) => {
-    console.log('Clicked option:', option)
-
     if (option === 'Related News') {
         showRelatedNewsFilters.value = true
         showAnalyzePopup.value = false
@@ -103,15 +108,15 @@ const updateBodyBackground = () => {
 watch(theme, updateBodyBackground)
 
 watch(customCoin, (val) => {
-  if (val && selectedCoin.value !== 'other') {
-    selectedCoin.value = ''
-  }
+    if (val && selectedCoin.value !== 'other') {
+        selectedCoin.value = ''
+    }
 })
 
 watch(selectedCoin, (val) => {
-  if (val && val !== 'other') {
-    customCoin.value = ''
-  }
+    if (val && val !== 'other') {
+        customCoin.value = ''
+    }
 })
 const coinOptions = [
     { name: 'Bitcoin', symbol: 'BTC' },
@@ -134,16 +139,16 @@ const coinImagePath = computed(() => {
 })
 
 const goToOptions = () => {
-  if (selectedCoin.value === 'other' && customCoin.value.trim()) {
-    selectedCoin.value = customCoin.value.toUpperCase()
-  }
+    if (selectedCoin.value === 'other' && customCoin.value.trim()) {
+        selectedCoin.value = customCoin.value.toUpperCase()
+    }
 
-  if (selectedCoin.value) {
-    step.value = 2
-    router.push('/')
-  } else {
-    alert('Please select or enter a coin first.')
-  }
+    if (selectedCoin.value) {
+        step.value = 2
+        router.push('/')
+    } else {
+        alert('Please select or enter a coin first.')
+    }
 }
 
 const backToSelect = () => {
@@ -228,7 +233,11 @@ const hoverIndex = ref(null)
                 </div>
             </div>
         </div>
+        <button class="option-button" @click="toggleTestApi">
+            {{ showTestApi ? 'Hide Test API' : 'Call Test API' }}
+        </button>
 
+        <TestApi v-if="showTestApi" />
         <RelatedNews v-if="showRelatedNews" :coin="selectedCoin" :filter="selectedFilter" :kind="selectedKind"
             @close="closePopup" />
         <Analyze v-if="showAnalyzePopup" :coin="selectedCoin" />

@@ -7,3 +7,5 @@ export function handleAuthError(error) {
         alert('An error occurred while fetching data.')
     }
 }
+
+export const backend_url = import.meta.env.VITE_API_URL;
