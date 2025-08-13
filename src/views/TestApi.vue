@@ -8,7 +8,7 @@ const error = ref(null)
 const loading = ref(false)
 
 // Replace with your actual JWT
-const API_TOKEN = localStorage.getItem('jwt_token')
+const API_TOKEN = localStorage.getItem('token')
 
 
 const callTestApi = async () => {

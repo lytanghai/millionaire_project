@@ -57,7 +57,7 @@ const loading = ref(false)
 const error = ref(null)
 
 // Put your real token here or get dynamically if needed
-const API_TOKEN = localStorage.getItem('jwt_token')
+const API_TOKEN = localStorage.getItem('token')
 
 const fetchNews = () => {
     if (!props.coin) return
