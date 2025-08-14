@@ -94,14 +94,18 @@ ul li::before {
 
 .coin-logo-wrapper {
   display: flex;
-  justify-content: center; /* center horizontally */
-  align-items: center;     /* center vertically if needed */
+  justify-content: center;
+  /* center horizontally */
+  align-items: center;
+  /* center vertically if needed */
   margin-bottom: 1rem;
   background-color: white;
   padding: 0.3rem;
   border-radius: 50%;
-  width: 60px;  /* smaller size */
-  height: 60px; /* smaller size */
+  width: 60px;
+  /* smaller size */
+  height: 60px;
+  /* smaller size */
   margin-left: auto;
   margin-right: auto;
 }
@@ -345,15 +349,17 @@ ul li::before {
 
           <p><strong>Name:</strong> {{ apiData.symbol_name || '*Information Unavailable' }}</p>
           <p><strong>Symbol:</strong> {{ apiData.symbol || '*Information Unavailable' }}</p>
-          <p><strong>Rank:</strong> <span class="fire-brush-bg">{{ apiData.rank || '*Information Unavailable' }}</span> </p>
+          <p><strong>Rank:</strong> <span class="fire-brush-bg">{{ apiData.rank || '*Information Unavailable' }}</span></p>
           <p><strong>Layer:</strong> {{ apiData.id || '*Information Unavailable' }} | {{ apiData.name || '*Information Unavailable' }} </p>
           <p><strong>Currently Active:</strong> {{ apiData.is_active ? 'Yes' : 'No' }}</p>
           <p><strong>New Coin:</strong> {{ apiData.is_new ? 'Yes' : 'No' }}</p>
           <p><strong>Type:</strong> {{ apiData.type || '*Information Unavailable' }}</p>
           <p><strong>Open Source:</strong> {{ apiData.open_source === true ? 'YES' : 'NO' || '*Information Unavailable' }}</p>
-          <p><strong>Started at:</strong> {{ formatDateToGMT7(apiData.started_at) || '*Information Unavailable' }}</p>
+          <p><strong>Listed Date:</strong> {{ cgData.listed_date || '*Information Unavailable' }}</p>
           <p><strong>Organization Structure:</strong> {{ apiData.org_structure || '*Information Unavailable' }}</p>
           <p><strong>Hash Algorithm:</strong> {{ apiData.hash_algorithm || '*Information Unavailable' }}</p>
+          <p><strong>Categories:</strong> {{ cgData.categories || '*Information Unavailable' }}</p>
+          <p><strong>Country Origin:</strong> {{ cgData.country_origin || '*Information Unavailable' }}</p>
           <p><strong>Description:</strong></p>
           <div v-html="apiData.coin_description || '---'"></div>
         </template>
@@ -371,10 +377,20 @@ ul li::before {
                   </li>
                 </ul>
               </section>
+              <section v-if="cgData.developer_data">
+                <h3>Developer Data</h3>
+                <ul>
+                  <li v-for="(value, key) in cgData.developer_data" :key="key">
+                    {{ key }} — {{ value }}
+                  </li>
+                </ul>
+              </section>
             </ul>
           </section>
           <section>
             <h3>Risk Factors</h3>
+            <p><strong>Whitepaper:</strong></p>
+            <a style="text-decoration: none; color: #fafafa;" :href="url" target="_blank">{{ cgData.whitepaper }}</a>
 
             <h4>Explorer</h4>
             <ul>
@@ -397,14 +413,22 @@ ul li::before {
           <h2>Market Information</h2>
           <div class="market-info">
             <div class="market-col">
-              <p><strong>Current Price:</strong> --- </p>
-              <p><strong>All Time High:</strong> --- </p>
-              <p><strong>All Time Low:</strong> --- </p>
+              <p><strong>Current Price:</strong> {{ cgData.current_price || '*Information Unavailable' }} --- </p>
+              <p><strong>All Time High Date:</strong> {{ cgData.ath_date || '*Information Unavailable' }} </p>
+              <p><strong>All Time High:</strong> {{ cgData.ath_price || '*Information Unavailable' }}</p>
+              <p><strong>All Time Low Date:</strong> {{ cgData.atl_date || '*Information Unavailable' }} </p>
+              <p><strong>All Time Low:</strong> {{ cgData.atl_price || '*Information Unavailable' }} </p>
               <p><strong>Low 24h:</strong> --- </p>
               <p><strong>High 24h:</strong> --- </p>
+              <p><strong>Fully Diluted Valuation:</strong> {{cgData.fully_diluted_valuation || '*Information Unavailable' }} </p>
+              <p><strong>Total Supply:</strong> {{cgData.total_supply || '*Information Unavailable' }} </p>
+              <p><strong>Circulating Supply:</strong> {{cgData.circulating_supply || '*Information Unavailable' }} </p>
+              <p><strong>Max Supply:</strong> {{cgData.max_supply || '*Information Unavailable' }} </p>
+              <p><strong>Market Cap FDV R atio:</strong> {{cgData.market_cap_fdv_ratio || '*Information Unavailable' }} </p>
+              <p><strong>Supply Infinite:</strong> {{cgData.max_supply_infinite || '*Information Unavailable' }} </p>
             </div>
             <div class="market-col">
-              <p><strong>Market Cap:</strong> --- </p>
+              <p><strong>Market Cap:</strong>{{cgData.market_cap || '*Information Unavailable' }} </p>
               <p><strong>Volume:</strong> --- </p>
               <p><strong>Last 24h Trades:</strong> --- </p>
               <p><strong>Volatility:</strong> --- </p>
@@ -466,10 +490,9 @@ ul li::before {
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { formatDateToGMT7 } from '@/assets/data/dateUtil';
 import { backend_url } from '@/assets/data/common';
 import axios from 'axios';
+import { onMounted, ref } from 'vue';
 
 // Receive coin as a prop from parent
 const props = defineProps({
@@ -486,17 +509,17 @@ const currentSlide = ref(0);
 const maxSlide = 3;
 
 const apiData = ref(null);
-const ohlcData = ref({});
+const cgData = ref({});
 const errorMsg = ref('');
 
 
 const jwtToken = localStorage.getItem('token');
 
-function triggerApi(topicOperation, targetRef) {
+function triggerApi(topicOperation, provierName, targetRef) {
   const url = backend_url + '/service/trigger';
   const payload = {
     topic_name: 'analyze',
-    provider_name: 'coin_paprika',
+    provider_name: provierName,
     payload: {
       topic_operation: topicOperation,
       coin: props.coin,
@@ -527,8 +550,8 @@ function triggerApi(topicOperation, targetRef) {
 }
 
 onMounted(() => {
-  triggerApi('GET_COIN_DETAIL', apiData);
-  triggerApi('GET_TODAY_OHLC', ohlcData);
+  triggerApi('GET_COIN_DETAIL', 'coin_paprika', apiData);
+  triggerApi('CG_GET_COIN_DETAIL', 'coin_gecko', cgData);
 });
 
 // Coin Market Cap API

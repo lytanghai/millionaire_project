@@ -199,7 +199,8 @@ onMounted(() => {
 
 <template>
     <div :class="['app', theme]">
-        <div class="trading-timetable">
+        <!--
+            <div class="trading-timetable">
             <h4>Crypto Market Sessions</h4>
             <ul>
                 <li v-for="session in tradingSessions" :key="session.name"
@@ -210,7 +211,9 @@ onMounted(() => {
             <div class="current-time">
                 {{ currentGMT7 }}
             </div>
-        </div>
+        </div>    
+  -->
+
         <div class="modal" :style="{ backgroundColor: modalBackground }">
             <!-- Step 1: Select coin -->
             <div v-if="step === 1" class="coin-selector">
@@ -342,8 +345,9 @@ body,
     position: relative;
 }
 
-.trading-timetable li.active::before {
-    content: '▶';
+.trading-timetable li.active::after {
+    /* content: '▶'; */
+    content: '🔥';
     color: #ffb547;
     margin-right: 0.4rem;
 }
