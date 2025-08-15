@@ -530,7 +530,7 @@ function triggerApi(topicOperation, providerName, targetRef) {
   }
 
   showLoader.value = true
-
+  console.log("payload: " + payload)
   axios.post(url, payload, { headers })
 
     .then(response => {
