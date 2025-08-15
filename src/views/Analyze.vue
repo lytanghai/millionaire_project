@@ -380,8 +380,11 @@ ul li::before {
           <section>
             <h3>Risk Factors</h3>
             <p><strong>Whitepaper:</strong></p>
-            <!-- <a style="text-decoration: none; color: #fafafa;" :href="url" target="_blank">{{ cgData.whitepaper }}</a> -->
-
+            <ul>
+              <li v-for="(url, name) in apiData.whitepaper" :key="'whitepaper-' + name">
+                <a style="text-decoration: none; color: #fafafa;" :href="url" target="_blank">{{ name }}</a>
+              </li>
+            </ul>
             <h4>Explorer</h4>
             <ul>
               <li v-for="(url, name) in apiData.explorer" :key="'explorer-' + name">
@@ -418,10 +421,16 @@ ul li::before {
               <p><strong>Supply Infinite:</strong> {{cgData.max_supply_infinite || '*Information Unavailable' }} </p> -->
             </div>
             <div class="market-col">
-              <!-- <p><strong>Market Cap:</strong>{{cgData.market_cap || '*Information Unavailable' }} </p> -->
-              <p><strong>Volume:</strong> --- </p>
-              <p><strong>Last 24h Trades:</strong> --- </p>
-              <p><strong>Volatility:</strong> --- </p>
+              <p><strong>Market Cap:</strong>{{ohclData.market_cap || '*Information Unavailable' }} </p>
+              <p><strong>Volume:</strong>{{ohclData.volume || '*Information Unavailable' }} </p>
+              <h3>Today</h3>
+              <p><strong>Opened Time:</strong> {{ohclData.time_open || '*Information Unavailable' }} </p>
+              <p><strong>Opened At:</strong> {{ohclData.open || '*Information Unavailable' }} </p>
+              <p><strong>Lowest At:</strong> {{ohclData.low || '*Information Unavailable' }} </p>
+              <p><strong>Closed Time:</strong> {{ohclData.close || '*Information Unavailable' }} </p>
+              <p><strong>Closed At:</strong>{{ohclData.time_close || '*Information Unavailable' }} </p>
+              <p><strong>Highest At:</strong> {{ohclData.high || '*Information Unavailable' }} </p>
+              <p><strong>Volatility:</strong> {{ volatilityPercent || '*Information Unavailable' }} </p>
             </div>
           </div>
         </template>
@@ -480,7 +489,7 @@ ul li::before {
 </template>
 
 <script setup>
-import { backend_url } from '@/assets/data/common';
+import { backend_url, calculateIntradayVolatility } from '@/assets/data/common';
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
 
@@ -499,51 +508,62 @@ const currentSlide = ref(0);
 const maxSlide = 3;
 
 const apiData = ref(null);
+const ohclData = ref(null);
 const errorMsg = ref('');
+const volatilityPercent = ref('---');
 
-// Fetch from CoinGecko directly
 const jwtToken = localStorage.getItem('token');
 
-function triggerApi(topicOperation, provierName, targetRef) {
-  const url = backend_url + '/service/trigger';
+function triggerApi(topicOperation, providerName, targetRef) {
+  const url = backend_url + '/service/trigger'
   const payload = {
     topic_name: 'analyze',
-    provider_name: provierName,
+    provider_name: providerName,
     payload: {
       topic_operation: topicOperation,
       coin: props.coin,
     },
-  };
+  }
   const headers = {
     Authorization: `Bearer ${jwtToken}`,
     'Content-Type': 'application/json',
-  };
+  }
 
-  showLoader.value = true;
+  showLoader.value = true
 
   axios.post(url, payload, { headers })
+
     .then(response => {
 
       if (response.data.status === 'success') {
-        targetRef.value = response.data.data.content;
+        targetRef.value = response.data.data.content
+
+        if (topicOperation === 'GET_TODAY_OHLC') {
+          const { high, low } = targetRef.value
+          if (high && low) {
+            const vol = calculateIntradayVolatility(high, low)
+            volatilityPercent.value = (vol * 100).toFixed(2) + '%'
+          } else {
+            volatilityPercent.value = '---'
+          }
+        }
+
       } else {
-        errorMsg.value = `API returned status: ${response.data.status}`;
+        errorMsg.value = `API returned status: ${response.data.status}`
       }
     })
     .catch(error => {
-      errorMsg.value = `Failed to fetch ${topicOperation} data: ${error.message}`;
+      errorMsg.value = `Failed to fetch ${topicOperation} data: ${error.message}`
     })
     .finally(() => {
-      showLoader.value = false;
-    });
+      showLoader.value = false
+    })
 }
 
 onMounted(() => {
   triggerApi('GET_COIN_DETAIL', 'coin_paprika', apiData);
+  triggerApi('GET_TODAY_OHLC', 'coin_paprika', ohclData);
 });
-
-// Coin Market Cap API
-
 
 function nextSlide() {
   if (currentSlide.value < maxSlide) currentSlide.value++;
