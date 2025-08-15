@@ -26,6 +26,10 @@ const theme = ref('dark')
 const selectedFilter = ref('')
 const selectedKind = ref('all')
 
+const goToTestApi = () => {
+    router.push('/test')
+}
+
 const relatedNewsFilters = [
     'rising', 'hot', 'bullish', 'bearish', 'important', 'saved', 'lol'
 ]
@@ -213,6 +217,9 @@ onMounted(() => {
             </div>
         </div>    
   -->
+        <button class="continue-button" @click="goToTestApi">
+            Open API Tester
+        </button>
 
         <div class="modal" :style="{ backgroundColor: modalBackground }">
             <!-- Step 1: Select coin -->

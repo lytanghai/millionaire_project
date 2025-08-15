@@ -58,17 +58,17 @@ async function sendRequest() {
 
 <template>
   <div class="max-w-5xl mx-auto p-6 space-y-6 font-sans">
-    <h1 class="text-3xl font-bold text-center text-indigo-600 mb-6">🚀 Modern API Tester</h1>
+    <h1 style="color: #fff">🚀 Modern API Tester</h1>
 
     <!-- URL & Method Card -->
     <div class="bg-white shadow-lg rounded-xl p-6 space-y-4 border-l-4 border-indigo-500">
       <div>
-        <label class="block font-semibold text-gray-700 mb-1">API URL:</label>
+        <label style="color: #fff">API URL:</label>
         <input v-model="apiUrl" type="text" placeholder="https://api.example.com/endpoint"
                class="border rounded-lg p-3 w-full focus:ring-2 focus:ring-indigo-300 outline-none transition" />
       </div>
       <div>
-        <label class="block font-semibold text-gray-700 mb-1">Method:</label>
+        <label style="color: #fff">Method:</label>
         <select v-model="method" class="border rounded-lg p-3 w-full focus:ring-2 focus:ring-indigo-300 outline-none transition">
           <option>GET</option>
           <option>POST</option>
@@ -80,7 +80,7 @@ async function sendRequest() {
 
     <!-- Headers Card -->
     <div class="bg-white shadow-lg rounded-xl p-6 border-l-4 border-green-500 space-y-3">
-      <h2 class="font-bold text-gray-800 text-lg mb-2">Headers</h2>
+      <h2 style="color: #fff">Headers</h2>
       <div v-for="(h, index) in headers" :key="index" class="flex gap-2 mb-2">
         <input v-model="h.key" type="text" placeholder="Key"
                class="border rounded-lg p-2 flex-1 focus:ring-2 focus:ring-green-200 outline-none transition" />
@@ -95,7 +95,7 @@ async function sendRequest() {
 
     <!-- Payload Card -->
     <div class="bg-white shadow-lg rounded-xl p-6 border-l-4 border-yellow-500 space-y-2">
-      <h2 class="font-bold text-gray-800 text-lg mb-2">Payload (JSON)</h2>
+      <h2 style="color: #fff">Payload (JSON)</h2>
       <textarea v-model="payload" rows="5" placeholder='{ "key": "value" }'
                 class="border rounded-lg p-3 w-full focus:ring-2 focus:ring-yellow-200 outline-none transition font-mono"></textarea>
     </div>
@@ -110,18 +110,18 @@ async function sendRequest() {
 
     <!-- API Response Card -->
     <div v-if="apiResponse" class="bg-gray-50 shadow-lg rounded-xl p-6 border-l-4 border-blue-500">
-      <h2 class="font-bold text-lg text-gray-800 mb-2">Proxied API Response</h2>
+      <h2 style="color: #fff">Proxied API Response</h2>
       <pre class="bg-gray-100 p-4 rounded-lg overflow-x-auto text-sm">{{ apiResponse }}</pre>
     </div>
 
     <!-- Backend Response Card -->
     <div v-if="backendResponse" class="bg-gray-50 shadow-lg rounded-xl p-6 border-l-4 border-purple-500">
-      <h2 class="font-bold text-lg text-gray-800 mb-2">Backend Full Response</h2>
+      <h2 style="color: #fff">Backend Full Response</h2>
       <pre class="bg-gray-100 p-4 rounded-lg overflow-x-auto text-sm">{{ backendResponse }}</pre>
     </div>
 
     <!-- Error Message -->
-    <div v-if="errorMsg" class="text-red-600 font-semibold text-center mt-4">{{ errorMsg }}</div>
+    <div v-if="errorMsg" style="color: #fff">{{ errorMsg }}</div>
   </div>
 </template>
 
