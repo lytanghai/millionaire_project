@@ -355,11 +355,9 @@ ul li::before {
           <p><strong>New Coin:</strong> {{ apiData.is_new ? 'Yes' : 'No' }}</p>
           <p><strong>Type:</strong> {{ apiData.type || '*Information Unavailable' }}</p>
           <p><strong>Open Source:</strong> {{ apiData.open_source === true ? 'YES' : 'NO' || '*Information Unavailable' }}</p>
-          <p><strong>Listed Date:</strong> {{ cgData.listed_date || '*Information Unavailable' }}</p>
+          <p><strong>Listed Date:</strong> {{ apiData.started_at || '*Information Unavailable' }}</p>
           <p><strong>Organization Structure:</strong> {{ apiData.org_structure || '*Information Unavailable' }}</p>
           <p><strong>Hash Algorithm:</strong> {{ apiData.hash_algorithm || '*Information Unavailable' }}</p>
-          <p><strong>Categories:</strong> {{ cgData.categories || '*Information Unavailable' }}</p>
-          <p><strong>Country Origin:</strong> {{ cgData.country_origin || '*Information Unavailable' }}</p>
           <p><strong>Description:</strong></p>
           <div v-html="apiData.coin_description || '---'"></div>
         </template>
@@ -377,20 +375,12 @@ ul li::before {
                   </li>
                 </ul>
               </section>
-              <section v-if="cgData.developer_data">
-                <h3>Developer Data</h3>
-                <ul>
-                  <li v-for="(value, key) in cgData.developer_data" :key="key">
-                    {{ key }} — {{ value }}
-                  </li>
-                </ul>
-              </section>
             </ul>
           </section>
           <section>
             <h3>Risk Factors</h3>
             <p><strong>Whitepaper:</strong></p>
-            <a style="text-decoration: none; color: #fafafa;" :href="url" target="_blank">{{ cgData.whitepaper }}</a>
+            <!-- <a style="text-decoration: none; color: #fafafa;" :href="url" target="_blank">{{ cgData.whitepaper }}</a> -->
 
             <h4>Explorer</h4>
             <ul>
@@ -413,7 +403,7 @@ ul li::before {
           <h2>Market Information</h2>
           <div class="market-info">
             <div class="market-col">
-              <p><strong>Current Price:</strong> {{ cgData.current_price || '*Information Unavailable' }} --- </p>
+              <!-- <p><strong>Current Price:</strong> {{ cgData.current_price || '*Information Unavailable' }} --- </p>
               <p><strong>All Time High Date:</strong> {{ cgData.ath_date || '*Information Unavailable' }} </p>
               <p><strong>All Time High:</strong> {{ cgData.ath_price || '*Information Unavailable' }}</p>
               <p><strong>All Time Low Date:</strong> {{ cgData.atl_date || '*Information Unavailable' }} </p>
@@ -425,10 +415,10 @@ ul li::before {
               <p><strong>Circulating Supply:</strong> {{cgData.circulating_supply || '*Information Unavailable' }} </p>
               <p><strong>Max Supply:</strong> {{cgData.max_supply || '*Information Unavailable' }} </p>
               <p><strong>Market Cap FDV R atio:</strong> {{cgData.market_cap_fdv_ratio || '*Information Unavailable' }} </p>
-              <p><strong>Supply Infinite:</strong> {{cgData.max_supply_infinite || '*Information Unavailable' }} </p>
+              <p><strong>Supply Infinite:</strong> {{cgData.max_supply_infinite || '*Information Unavailable' }} </p> -->
             </div>
             <div class="market-col">
-              <p><strong>Market Cap:</strong>{{cgData.market_cap || '*Information Unavailable' }} </p>
+              <!-- <p><strong>Market Cap:</strong>{{cgData.market_cap || '*Information Unavailable' }} </p> -->
               <p><strong>Volume:</strong> --- </p>
               <p><strong>Last 24h Trades:</strong> --- </p>
               <p><strong>Volatility:</strong> --- </p>
@@ -509,24 +499,9 @@ const currentSlide = ref(0);
 const maxSlide = 3;
 
 const apiData = ref(null);
-// const cgData = ref({});
 const errorMsg = ref('');
 
 // Fetch from CoinGecko directly
-async function fetchCgData() {
-  try {
-  
-    const response = await axios.get(`https://api.coingecko.com/api/v3/coins/bitcoin`, {
-      headers: {
-        Accept: 'application/json',
-      }
-    });
-    cgData.value = response.data;
-    console.log("data: " + cgData.value)
-  } catch (err) {
-    errorMsg.value = `CoinGecko error: ${err.message}`;
-  }
-}
 const jwtToken = localStorage.getItem('token');
 
 function triggerApi(topicOperation, provierName, targetRef) {
@@ -565,7 +540,6 @@ function triggerApi(topicOperation, provierName, targetRef) {
 
 onMounted(() => {
   triggerApi('GET_COIN_DETAIL', 'coin_paprika', apiData);
-  fetchCgData();
 });
 
 // Coin Market Cap API
