@@ -25,7 +25,6 @@ function removeHeaderField(index) {
   headers.value.splice(index, 1)
 }
 
-// Send request to backend /test
 async function sendRequest() {
   try {
     errorMsg.value = ''
@@ -39,13 +38,25 @@ async function sendRequest() {
       if (h.key && h.value) headersObj[h.key] = h.value
     })
 
+    // Construct curl command for logging
+    const curlParts = [`curl -X ${method.value.toUpperCase()}`]
+    Object.entries(headersObj).forEach(([key, val]) => {
+      curlParts.push(`-H "${key}: ${val}"`)
+    })
+    if (payload.value) {
+      curlParts.push(`-d '${payload.value}'`)
+    }
+    curlParts.push(`"${backend_url}/test"`)
+    console.log('CURL Equivalent:', curlParts.join(' '))
+
+    // Send request to backend
     const res = await axios.post(`${backend_url}/test`, {
       url: apiUrl.value,
       method: method.value,
       headers: headersObj,
       body: payload.value ? JSON.parse(payload.value) : null
     })
-
+        
     backendResponse.value = res.data               // full backend response
     apiResponse.value = res.data.data || res.data  // proxied API data
   } catch (err) {
@@ -54,6 +65,7 @@ async function sendRequest() {
     loading.value = false
   }
 }
+
 </script>
 
 <template>
