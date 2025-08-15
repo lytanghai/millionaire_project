@@ -509,10 +509,24 @@ const currentSlide = ref(0);
 const maxSlide = 3;
 
 const apiData = ref(null);
-const cgData = ref({});
+// const cgData = ref({});
 const errorMsg = ref('');
 
-
+// Fetch from CoinGecko directly
+async function fetchCgData() {
+  try {
+  
+    const response = await axios.get(`https://api.coingecko.com/api/v3/coins/bitcoin`, {
+      headers: {
+        Accept: 'application/json',
+      }
+    });
+    cgData.value = response.data;
+    console.log("data: " + cgData.value)
+  } catch (err) {
+    errorMsg.value = `CoinGecko error: ${err.message}`;
+  }
+}
 const jwtToken = localStorage.getItem('token');
 
 function triggerApi(topicOperation, provierName, targetRef) {
@@ -551,12 +565,10 @@ function triggerApi(topicOperation, provierName, targetRef) {
 
 onMounted(() => {
   triggerApi('GET_COIN_DETAIL', 'coin_paprika', apiData);
-  triggerApi('CG_GET_COIN_DETAIL', 'coin_gecko', cgData);
+  fetchCgData();
 });
 
 // Coin Market Cap API
-
-
 
 
 function nextSlide() {
