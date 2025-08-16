@@ -430,13 +430,13 @@ ul li::before {
         </template>
 
         <template v-else-if="currentSlide === 3">
-          <h2>Crypto Exchanges</h2>
+          <h2>Crypto Exchanges *{{marketData.num_of_exchanges || '*Information Unavailable' }}</h2>
+          <p> Latest at: {{ formatDate(exchange.last_updated_at) }} </p>
           <table class="exchange-table">
             <thead>
               <tr>
                 <th>Name</th>
                 <th>Value</th>
-                <th>Last Updated At</th>
                 <th>Trust</th>
               </tr>
             </thead>
@@ -444,7 +444,6 @@ ul li::before {
               <tr v-for="(exchange, index) in exchangeData" :key="index">
                 <td>{{ exchange.exchange_name }}</td>
                 <td>{{ exchange.value.toFixed(2) }}</td>
-                <td>{{ formatDate(exchange.last_updated_at) }}</td>
                 <td>{{ exchange.trust_score }}</td>
               </tr>
             </tbody>
