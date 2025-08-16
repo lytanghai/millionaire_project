@@ -217,9 +217,9 @@ onMounted(() => {
             </div>
         </div>    
   -->
-        <button class="continue-button" @click="goToTestApi">
+        <!-- <button class="continue-button" @click="goToTestApi">
             Open API Tester
-        </button>
+        </button> -->
 
         <div class="modal" :style="{ backgroundColor: modalBackground }">
             <!-- Step 1: Select coin -->

@@ -380,11 +380,8 @@ ul li::before {
           <section>
             <h3>Risk Factors</h3>
             <p><strong>Whitepaper:</strong></p>
-            <ul>
-              <li v-for="(url, name) in apiData.whitepaper" :key="'whitepaper-' + name">
-                <a style="text-decoration: none; color: #fafafa;" :href="url" target="_blank">{{ name }}</a>
-              </li>
-            </ul>
+              <a style="text-decoration: none; color: #fafafa;" :href="url" target="_blank">{{ apiData.whitepaper }}</a>
+
             <h4>Explorer</h4>
             <ul>
               <li v-for="(url, name) in apiData.explorer" :key="'explorer-' + name">
@@ -406,23 +403,20 @@ ul li::before {
           <h2>Market Information</h2>
           <div class="market-info">
             <div class="market-col">
-              <!-- <p><strong>Current Price:</strong> {{ cgData.current_price || '*Information Unavailable' }} --- </p>
-              <p><strong>All Time High Date:</strong> {{ cgData.ath_date || '*Information Unavailable' }} </p>
-              <p><strong>All Time High:</strong> {{ cgData.ath_price || '*Information Unavailable' }}</p>
-              <p><strong>All Time Low Date:</strong> {{ cgData.atl_date || '*Information Unavailable' }} </p>
-              <p><strong>All Time Low:</strong> {{ cgData.atl_price || '*Information Unavailable' }} </p>
-              <p><strong>Low 24h:</strong> --- </p>
-              <p><strong>High 24h:</strong> --- </p>
-              <p><strong>Fully Diluted Valuation:</strong> {{cgData.fully_diluted_valuation || '*Information Unavailable' }} </p>
-              <p><strong>Total Supply:</strong> {{cgData.total_supply || '*Information Unavailable' }} </p>
-              <p><strong>Circulating Supply:</strong> {{cgData.circulating_supply || '*Information Unavailable' }} </p>
-              <p><strong>Max Supply:</strong> {{cgData.max_supply || '*Information Unavailable' }} </p>
-              <p><strong>Market Cap FDV R atio:</strong> {{cgData.market_cap_fdv_ratio || '*Information Unavailable' }} </p>
-              <p><strong>Supply Infinite:</strong> {{cgData.max_supply_infinite || '*Information Unavailable' }} </p> -->
+              <p><strong>Market Cap:</strong>{{marketData.market_cap || '*Information Unavailable' }} </p>
+              <p><strong>Volume:</strong>{{ohclData.volume || '*Information Unavailable' }} </p>
+              <p><strong>Current Price:</strong> {{ marketData.price || '*Information Unavailable' }} --- </p>
+              <p><strong>Update Current Price:</strong> {{ marketData.price_at || '*Information Unavailable' }} --- </p>
+              <p><strong>Fully Diluted Valuation:</strong> {{marketData.fully_diluted_market_cap || '*Information Unavailable' }} </p>
+              <p><strong>Circulating Supply:</strong> {{marketData.supply.circulating || '*Information Unavailable' }} </p>
+              <p><strong>Total Supply:</strong> {{marketData.supply.total || '*Information Unavailable' }} </p>
+              <p><strong>Supply Info Update:</strong> {{marketData.supply.supplyAt || '*Information Unavailable' }} </p>
+              <p><strong>Number of Exchanges: </strong>  {{marketData.num_of_exchanges || '*Information Unavailable' }} </p>
+              <p><strong>Number of Markets: </strong>  {{marketData.num_of_markets || '*Information Unavailable' }} </p>
+              <p><strong>All Time High Date: </strong>  {{marketData.ath_date || '*Information Unavailable' }} </p>
+              <p><strong>All Time High Price: </strong>  {{marketData.ath_price || '*Information Unavailable' }} </p>
             </div>
             <div class="market-col">
-              <p><strong>Market Cap:</strong>{{ohclData.market_cap || '*Information Unavailable' }} </p>
-              <p><strong>Volume:</strong>{{ohclData.volume || '*Information Unavailable' }} </p>
               <h3>Today</h3>
               <p><strong>Opened Time:</strong> {{ohclData.time_open || '*Information Unavailable' }} </p>
               <p><strong>Opened At:</strong> {{ohclData.open || '*Information Unavailable' }} </p>
@@ -435,7 +429,6 @@ ul li::before {
           </div>
         </template>
 
-
         <template v-else-if="currentSlide === 3">
           <h2>Crypto Exchanges</h2>
           <table class="exchange-table">
@@ -443,29 +436,16 @@ ul li::before {
               <tr>
                 <th>Name</th>
                 <th>Value</th>
+                <th>Last Updated At</th>
                 <th>Trust</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Binance</td>
-                <td>---</td>
-                <td>---</td>
-              </tr>
-              <tr>
-                <td>Bitget</td>
-                <td>---</td>
-                <td>---</td>
-              </tr>
-              <tr>
-                <td>Gate</td>
-                <td>---</td>
-                <td>---</td>
-              </tr>
-              <tr>
-                <td>KuCoin</td>
-                <td>---</td>
-                <td>---</td>
+              <tr v-for="(exchange, index) in exchangeData" :key="index">
+                <td>{{ exchange.exchange_name }}</td>
+                <td>{{ exchange.value.toFixed(2) }}</td>
+                <td>{{ formatDate(exchange.last_updated_at) }}</td>
+                <td>{{ exchange.trust_score }}</td>
               </tr>
             </tbody>
           </table>
@@ -492,6 +472,7 @@ ul li::before {
 import { backend_url, calculateIntradayVolatility } from '@/assets/data/common';
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
+import { formatDate } from '@/assets/data/dateUtil';
 
 // Receive coin as a prop from parent
 const props = defineProps({
@@ -509,10 +490,18 @@ const maxSlide = 3;
 
 const apiData = ref(null);
 const ohclData = ref(null);
+const marketData = ref(null);
+const exchangeData = ref(null);
+
+
 const errorMsg = ref('');
 const volatilityPercent = ref('---');
 
 const jwtToken = localStorage.getItem('token');
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 function triggerApi(topicOperation, providerName, targetRef) {
   const url = backend_url + '/service/trigger'
@@ -532,11 +521,16 @@ function triggerApi(topicOperation, providerName, targetRef) {
   showLoader.value = true
   console.log("payload: " + payload)
   axios.post(url, payload, { headers })
-
-    .then(response => {
+    .then(async response => {
+      // Wait for 3 seconds before processing
+      await sleep(3000)
 
       if (response.data.status === 'success') {
         targetRef.value = response.data.data.content
+
+        if(topicOperation === 'GET_EXCHANGE_PLATFORM' && providerName === 'coin_paprika') {
+          targetRef.value = response.data.data.content.result;
+        }
 
         if (topicOperation === 'GET_TODAY_OHLC') {
           const { high, low } = targetRef.value
@@ -555,14 +549,19 @@ function triggerApi(topicOperation, providerName, targetRef) {
     .catch(error => {
       errorMsg.value = `Failed to fetch ${topicOperation} data: ${error.message}`
     })
-    .finally(() => {
+    .finally(async () => {
+      // Optional: also delay hiding loader
+      await sleep(2000)
       showLoader.value = false
     })
 }
 
+
 onMounted(() => {
   triggerApi('GET_COIN_DETAIL', 'coin_paprika', apiData);
   triggerApi('GET_TODAY_OHLC', 'coin_paprika', ohclData);
+  triggerApi('GET_EXCHANGE_PLATFORM', 'coin_paprika', exchangeData);
+  triggerApi('CR_GET_COIN_DETAIL', 'coin_ranking', marketData);
 });
 
 function nextSlide() {
