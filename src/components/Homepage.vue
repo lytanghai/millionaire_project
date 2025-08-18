@@ -191,6 +191,10 @@ const updateActiveSession = () => {
 
 const activeSession = ref('')
 
+const goToGeneralDashboard = () => {
+    router.push('/general'); // assuming you have a route for General
+};
+
 // Start interval
 onMounted(() => {
     updateActiveSession()
@@ -222,6 +226,9 @@ onMounted(() => {
         </button> -->
 
         <div class="modal" :style="{ backgroundColor: modalBackground }">
+            <!-- Next button at top-right -->
+            <button class="next-button" @click="goToGeneralDashboard">Next</button>
+
             <!-- Step 1: Select coin -->
             <div v-if="step === 1" class="coin-selector">
                 <h2 class="modal-title">Select a Coin</h2>
@@ -325,6 +332,25 @@ body,
 .app.light {
     background-color: #f3f4f6;
     color: #111827;
+}
+
+.next-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #1dd89a;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    z-index: 1000;
+}
+
+.next-button:hover {
+    background-color: #13b47a;
 }
 
 .theme-toggle {
