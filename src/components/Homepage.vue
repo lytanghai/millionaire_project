@@ -6,12 +6,6 @@ import Analyze from '@/views/Analyze.vue'
 import { useRouter } from 'vue-router'
 
 // Test only
-import TestApi from '@/views/TestApi.vue'
-const showTestApi = ref(false)
-const toggleTestApi = () => {
-    showTestApi.value = !showTestApi.value
-}
-
 const router = useRouter()
 
 const showRelatedNews = ref(false)
@@ -25,10 +19,6 @@ const theme = ref('dark')
 
 const selectedFilter = ref('')
 const selectedKind = ref('all')
-
-const goToTestApi = () => {
-    router.push('/test')
-}
 
 const relatedNewsFilters = [
     'rising', 'hot', 'bullish', 'bearish', 'important', 'saved', 'lol'
@@ -207,28 +197,8 @@ onMounted(() => {
 
 <template>
     <div :class="['app', theme]">
-        <!--
-            <div class="trading-timetable">
-            <h4>Crypto Market Sessions</h4>
-            <ul>
-                <li v-for="session in tradingSessions" :key="session.name"
-                    :class="{ active: session.name === activeSession }">
-                    <strong>{{ session.name }}:</strong> {{ session.time }} ({{ session.volume }})
-                </li>
-            </ul>
-            <div class="current-time">
-                {{ currentGMT7 }}
-            </div>
-        </div>    
-  -->
-        <!-- <button class="continue-button" @click="goToTestApi">
-            Open API Tester
-        </button> -->
-
+        <button class="next-button" @click="goToGeneralDashboard">Forex News Impact</button>
         <div class="modal" :style="{ backgroundColor: modalBackground }">
-            <!-- Next button at top-right -->
-            <button class="next-button" @click="goToGeneralDashboard">Next</button>
-
             <!-- Step 1: Select coin -->
             <div v-if="step === 1" class="coin-selector">
                 <h2 class="modal-title">Select a Coin</h2>
@@ -300,11 +270,6 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-        <!-- <button class="option-button" @click="toggleTestApi">
-            {{ showTestApi ? 'Hide Test API' : 'Call Test API' }}
-        </button> -->
-
-        <!-- <TestApi v-if="showTestApi" /> -->
         <RelatedNews v-if="showRelatedNews" :coin="selectedCoin" :filter="selectedFilter" :kind="selectedKind"
             @close="closePopup" />
         <Analyze v-if="showAnalyzePopup" :coin="selectedCoin" />
@@ -341,7 +306,7 @@ body,
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 8px;
-    background-color: #1dd89a;
+    background-color: #1a5541;
     color: white;
     font-weight: 700;
     cursor: pointer;
@@ -372,26 +337,6 @@ body,
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.trading-timetable li.active {
-    color: #ffb547;
-    font-weight: bold;
-    position: relative;
-}
-
-.trading-timetable li.active::after {
-    /* content: '▶'; */
-    content: '🔥';
-    color: #ffb547;
-    margin-right: 0.4rem;
-}
-
-.current-time {
-    font-size: 0.8rem;
-    margin-top: 0.5rem;
-    color: #ccc;
-}
-
-/* Modal */
 .modal {
     position: fixed;
     top: 50%;
@@ -413,16 +358,13 @@ body,
     overflow-y: auto;
 }
 
-/* Blur background when overlay open */
 .blurred {
     filter: blur(5px);
     pointer-events: none;
-    /* Prevent clicking underneath overlay */
     user-select: none;
     transition: filter 0.3s ease;
 }
 
-/* Step 1 - Coin Selector */
 .coin-selector {
     width: 100%;
     text-align: center;
