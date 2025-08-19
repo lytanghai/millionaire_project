@@ -61,22 +61,33 @@ const goBack = () => router.back();
 const goToUpcomingEvents = () => router.push({ name: 'upcoming' });
 
 const downloadSample = async () => {
-  const jwtToken = localStorage.getItem('token');
-  const response = await axios.get(backend_url + "/source-of-news/download-sample", {
-    responseType: 'blob',
-    headers: {
-        Authorization: `Bearer ${jwtToken}`,
-        'Content-Type': 'multipart/form-data'
-      }
-  });
+  // Ask user for confirmation
+  const confirmed = window.confirm("Do you want to download the sample file?");
+  if (!confirmed) return; // do nothing if user cancels
 
-  const url = window.URL.createObjectURL(new Blob([response.data]));
-  const link = document.createElement('a');
-  link.href = url;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
+  try {
+    const response = await axios.get(backend_url + "/source-of-news/download-sample", {
+      responseType: 'blob',
+      headers: {
+        Authorization: `Bearer ${jwtToken}`
+      }
+    });
+
+    // Create a download link
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'upcoming.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url); // free memory
+  } catch (error) {
+    console.error('Download failed', error);
+  }
 };
+
 
 const openFileDialog = () => {
   fileInput.value.value = null;
