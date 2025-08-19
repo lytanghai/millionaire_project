@@ -61,8 +61,13 @@ const goBack = () => router.back();
 const goToUpcomingEvents = () => router.push({ name: 'upcoming' });
 
 const downloadSample = async () => {
+  const jwtToken = localStorage.getItem('token');
   const response = await axios.get(backend_url + "/source-of-news/download-sample", {
     responseType: 'blob',
+    headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        'Content-Type': 'multipart/form-data'
+      }
   });
 
   const url = window.URL.createObjectURL(new Blob([response.data]));
