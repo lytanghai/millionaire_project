@@ -62,7 +62,7 @@ const goToUpcomingEvents = () => router.push({ name: 'upcoming' });
 
 const downloadSample = () => {
   const link = document.createElement('a');
-  link.href = '/upcoming.xlsx'; // relative to public folder
+  link.href = import.meta.env.BASE_URL + 'upcoming.xlsx';
   link.download = 'upcoming.xlsx';
   link.click();
 };
