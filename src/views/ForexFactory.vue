@@ -60,11 +60,17 @@ const fileInput = ref(null);
 const goBack = () => router.back();
 const goToUpcomingEvents = () => router.push({ name: 'upcoming' });
 
-const downloadSample = () => {
+const downloadSample = async () => {
+  const response = await axios.get(backend_url + "/source-of-news/download-sample", {
+    responseType: 'blob',
+  });
+
+  const url = window.URL.createObjectURL(new Blob([response.data]));
   const link = document.createElement('a');
-  link.href = import.meta.env.BASE_URL + 'upcoming.xlsx';
-  link.download = 'upcoming.xlsx';
+  link.href = url;
+  document.body.appendChild(link);
   link.click();
+  link.remove();
 };
 
 const openFileDialog = () => {
