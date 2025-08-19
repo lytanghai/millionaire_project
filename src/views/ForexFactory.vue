@@ -66,6 +66,7 @@ const downloadSample = async () => {
   if (!confirmed) return; // do nothing if user cancels
 
   try {
+    const jwtToken = localStorage.getItem('token');
     const response = await axios.get(backend_url + "/source-of-news/download-sample", {
       responseType: 'blob',
       headers: {
