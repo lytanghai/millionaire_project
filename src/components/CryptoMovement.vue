@@ -487,6 +487,9 @@ const movements = [
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
+  *{
+    color: #000;
+  }
   .cards {
     grid-template-columns: repeat(4, 1fr);
   }

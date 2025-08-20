@@ -296,24 +296,36 @@ const getRecommendationClass = (g) => g.includes('bullish') ? 'green' : g.includ
 
 /* Responsive */
 @media (max-width: 480px) {
-  .main-actions {
-    flex-direction: column;
+ .header-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
   }
 
   .back-button,
   .next-button {
-    flex: 1 1 100%;
+    flex: none;          /* don’t stretch */
+    width: auto;         /* natural size */
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
   }
-  
+
+  /* Make main action buttons block (stacked) */
+  .main-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
   .upload-button,
   .sample-button,
   .crypto-movement {
-    flex: none;             /* remove the 200px min */
-    width: 100%;            /* make them full width */
-    height: 36px;           /* smaller height */
-    padding: 0.2rem 0.5rem; /* tighter padding */
-    font-size: 0.85rem;     /* shrink text a little */
-    border-radius: 8px;     /* less rounded on small screens */
+    flex: none;
+    width: 100%;         /* full width block */
+    height: 40px;        /* smaller height */
+    font-size: 0.9rem;
+    border-radius: 8px;
   }
 
 }

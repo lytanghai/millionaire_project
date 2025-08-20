@@ -123,9 +123,9 @@ const coinOptions = [
 const options = [
     'Related News',
     'Analyze',
-    'Whitepaper',
-    'Whale Activity',
-    'Tokenomics'
+    'Whitepaper *unavailable',
+    'Whale Activity *unavailable',
+    'Tokenomics *unavailable'
 ]
 
 const coinImagePath = computed(() => {
