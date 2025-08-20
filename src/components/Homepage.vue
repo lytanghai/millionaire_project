@@ -150,14 +150,6 @@ const backToSelect = () => {
 }
 
 const hoverIndex = ref(null)
-
-// Trading sessions with approximate volume ranking (high to low)
-const tradingSessions = [
-    { name: 'Tokyo', startUTC: 0, endUTC: 8, time: '00:00 - 08:00 GMT', volume: 'Medium' },
-    { name: 'London', startUTC: 8, endUTC: 16, time: '08:00 - 16:00 GMT', volume: 'High' },
-    { name: 'New York', startUTC: 13, endUTC: 21, time: '13:00 - 21:00 GMT', volume: 'High' },
-]
-
 const currentGMT7 = ref('') // store current GMT+7 string
 const formatGMT7 = () => {
     const now = new Date()
@@ -197,7 +189,7 @@ onMounted(() => {
 
 <template>
     <div :class="['app', theme]">
-        <button class="next-button" @click="goToGeneralDashboard">Forex News Impact</button>
+        <button class="next-button" @click="goToGeneralDashboard">Crypto Guideline</button>
         <div class="modal" :style="{ backgroundColor: modalBackground }">
             <!-- Step 1: Select coin -->
             <div v-if="step === 1" class="coin-selector">

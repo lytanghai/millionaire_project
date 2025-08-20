@@ -4,8 +4,6 @@ import Analyze from '@/views/Analyze.vue'
 import Authentication from '@/views/Authentication.vue'
 import { getToken, isTokenExpired, removeToken } from '@/assets/token'
 import ForexFactory from '@/views/ForexFactory.vue'
-import API from '@/components/API.vue'
-import UpcomingEvent from '@/views/UpcomingEvent.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Homepage },
@@ -13,7 +11,6 @@ const routes = [
   { path: '/login', name: 'Login', component: Authentication },
   { path: '/general', name: 'general', component: ForexFactory },
   { path: '/upcoming', name: 'upcoming',   component: () => import('@/views/UpcomingEvent.vue') },
-  { path: '/test', name:'Test',component: API }, // <-- this makes /test show your UI
 
 ]
 
